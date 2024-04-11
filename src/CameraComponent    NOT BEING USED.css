@@ -1,0 +1,93 @@
+/* CameraComponent.css */
+
+body {
+  background-color: #000; /* Set background color to black */
+}
+
+.camera-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.title {
+  font-family: Arial, sans-serif;
+  font-size: 2rem;
+  color: #fff; /* Set font color to bright white */
+  margin-bottom: 20px;
+}
+
+.webcam-container {
+  width: 400px;
+  height: 800px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  position: relative; /* Add position relative */
+}
+
+.webcam {
+  width: 100%;
+  height: auto;
+  position: absolute; /* Add position absolute */
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%) scaleX(-1); /* Center vertically and horizontally and flip horizontally */
+}
+
+.capture-button {
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.capture-button:hover {
+  background-color: #0056b3;
+}
+
+/* Add styles for the file upload button */
+input[type="file"] {
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px; /* Add margin to separate from other elements */
+}
+
+input[type="file"]:hover {
+  background-color: #0056b3;
+}
+
+.captured-image-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.captured-image-title {
+  font-size: 2rem; /* Adjust font size to match the title */
+  color: #fff; /* Set font color to bright white */
+  margin-bottom: 10px;
+}
+
+.captured-image {
+  width: 300px;
+  height: auto;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  margin-top: 10px;
+  transform: scaleX(-1); /* Flip horizontally */
+}
