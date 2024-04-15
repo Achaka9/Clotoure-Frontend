@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import Webcam from 'react-webcam';
 import Axios from 'axios';
+import shirtOutline from './cameraOutlines/shirt_outline1.png'; // Assuming you have imported the image correctly
 
 function CameraComponent() {
   const webcamRef = useRef(null);
@@ -53,35 +54,35 @@ function CameraComponent() {
     setFileName('');
   };
 
-  useEffect(() => {
-    const photoSection = document.getElementById('photo-section');
-    if (photoSection) {
-      photoSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [capturedImage]);
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-      <h1 style={{ marginBottom: '20px' }}>Camera Demo</h1>
-      <div style={{ width: '300px', height: '200px', marginBottom: '20px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <div style={{ position: 'relative', width: '800px', height: '600px' }}>
         <Webcam
           audio={false}
           ref={webcamRef}
           screenshotFormat="image/jpeg"
-          videoConstraints={{ width: 300, height: 200, facingMode: "user" }}
-          style={{ width: '100%', height: '100%' }}
+          videoConstraints={{ width: 800, height: 600, facingMode: "user" }}
+          style={{ position: 'absolute', width: '100%', height: '100%' }}
+        />
+        <img
+          src={shirtOutline}
+          alt="Shirt Outline"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: 600,
+            height: '100%',
+            opacity: 0.5,
+            zIndex: 2,
+            transform: 'translate(-50%, -50%)'
+          }}
         />
       </div>
-      <button onClick={capture} style={{ margin: '5px' }}>Capture Photo</button>
-      <button onClick={segment} disabled={loading} style={{ margin: '5px' }}>
-        {loading ? 'Loading...' : 'Segment'} 
+      <button onClick={capture} style={{ zIndex: 3 }}>Capture Photo</button>
+      <button onClick={segment} disabled={loading} style={{ zIndex: 3 }}>
+        {loading ? 'Loading...' : 'Segment'}
       </button>
-      {capturedImage && (
-        <div id="photo-section" style={{ margin: '20px' }}>
-          <img src={capturedImage} alt="Captured" style={{ width: '300px', height: 'auto' }} />
-          <button onClick={clearImage} style={{ margin: '5px' }}>Clear Photo</button>
-        </div>
-      )}
     </div>
   );
 }
