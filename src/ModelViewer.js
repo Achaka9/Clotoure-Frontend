@@ -1,6 +1,6 @@
 import React from 'react';
 
-/*
+
 
 // START EXAMPLE CODE
 import '@kitware/vtk.js/favicon';
@@ -19,7 +19,7 @@ import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
 import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
 import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
 
-//Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
+Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
 
 // ----------------------------------------------------------------------------
 // Standard rendering code setup
@@ -99,7 +99,7 @@ renderer.resetCamera();
 renderWindow.render();
 // END EXAMPMLE CODE
 
-*/
+
 function ModelViewer() {
   return (
     <div>
