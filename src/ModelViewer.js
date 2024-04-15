@@ -1,5 +1,7 @@
 import React from 'react';
 
+/*
+
 // START EXAMPLE CODE
 import '@kitware/vtk.js/favicon';
 
@@ -97,6 +99,7 @@ renderer.resetCamera();
 renderWindow.render();
 // END EXAMPMLE CODE
 
+*/
 function ModelViewer() {
   return (
     <div>
