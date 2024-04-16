@@ -8,7 +8,7 @@ npm init
 Next Paste and run this script into terminal
 
 ```
-npm install react react-dom react-scripts react-webcam web-vitals axios
+npm install react react-dom react-scripts react-webcam web-vitals axios react-bootstrap bootstrap
 ```
 
 In the "scripts" key in the generated package.json paste the following before "test":

@@ -1,10 +1,11 @@
 import React from 'react';
 
+import ImageButton from './ImageButton';
+
 function CameraPage() {
   return (
-    <div>
-      <h1>Camera Page</h1>
-      <p>This is the Camera Page.</p>
+    <div class="center">
+      <ImageButton/>
     </div>
   );
 }
