@@ -18,33 +18,93 @@ import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
 import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
 import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
 import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
+import vtkHttpDataSetReader from '@kitware/vtk.js/Sources/IO/Core/HttpDataSetReader';
+import vtkTextureMapToPlane from '@kitware/vtk.js/Filters/Texture/TextureMapToPlane';
+import vtkOpenGLPolyDataMapper$1 from '@kitware/vtk.js/Rendering/OpenGL/PolyDataMapper';
+import vtkOBJReader from '@kitware/vtk.js/IO/Misc/OBJReader';
+// Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
 
-Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
+
+
+function ModelViewer() {
 
 // ----------------------------------------------------------------------------
 // Standard rendering code setup
 // ----------------------------------------------------------------------------
 
-const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({
+const ScreenRenderer = vtkRenderWindow.newInstance({
   background: [0, 0, 0],
 });
-const renderer = fullScreenRenderer.getRenderer();
-const renderWindow = fullScreenRenderer.getRenderWindow();
+const ren = ScreenRenderer.getRenderer();
+const renwin = ScreenRenderer.getRenderWindow();
 
 // ----------------------------------------------------------------------------
 // Example code
 // ----------------------------------------------------------------------------
 
+// front image reader
+const reader = vtkHttpDataSetReader.newInstance({
+  fetchGzip: false, // Set to true if the data is gzip compressed
+});
+
+const url = 'path_to_your_jpeg_image.jpg';
+reader.setUrl(url);
+
+// back image reader
+const reader1 = vtkHttpDataSetReader.newInstance({
+  fetchGzip: false, // Set to true if the data is gzip compressed
+});
+
+const url1 = 'path_to_your_jpeg_image.jpg';
+reader.setUrl(url1);
+
+const objreader = vtkOBJReader.newInstance()
+objreader.setUrl('path_to_obj1.obj')
+
+const objreader1 = vtkOBJReader.newInstance()
+objreader1.setUrl('path_to_obj2.obj')
+
+//Create Texture object
+const texture = vtkTexture.newInstance();
+texture.setInputConnection(reader.getOutputPort());
+
+//Create second texture object
+const texture1 = vtkTexture.newInstance();
+texture1.setInputConnection(reader1.getOutputPort());
+
+//MapToModel
+const map_to_model = vtkTextureMapToPlane().newInstance();
+map_to_model.setInputConnection(objreader.getOutputPort());
+
+const map_to_model1 = vtkTextureMapToPlane().newInstance();
+map_to_model1.setInputConnection(objreader1.getOutputPort());
+
+
+//Create first actor
 const actor = vtkActor.newInstance();
 renderer.addActor(actor);
 
+//Create second actor
+const actor1 = vtkActor.newInstance();
+renderer.addActor(actor);
+
+// Create Mappers
 const mapper = vtkMapper.newInstance();
+const mapper1 = vtkMapper.newInstance();
+
+// Set Mappers to actors
+// set textures to actors
+
+mapper1.setInputConnection(map_to_model.getOutputPort());
+mapper.setInputConnection(map_to_model1.getOutputPort());
+
 actor.setMapper(mapper);
+actor.getProperty().setTexture(texture);
 
-const sphereSource = vtkSphereSource.newInstance();
-sphereSource.setThetaResolution(64);
-sphereSource.setPhiResolution(32);
+actor1.setMapper(mapper1);
+actor1.getProperty().setTexture(texture1);
 
+/*
 // create a filter on the fly to generate tcoords from normals
 const tcoordFilter = macro.newInstance((publicAPI, model) => {
   macro.obj(publicAPI, model); // make it an object
@@ -82,14 +142,14 @@ const tcoordFilter = macro.newInstance((publicAPI, model) => {
 })();
 
 tcoordFilter.setInputConnection(sphereSource.getOutputPort());
-mapper.setInputConnection(tcoordFilter.getOutputPort());
+
 
 const gridSource = vtkImageGridSource.newInstance();
 gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
 gridSource.setGridSpacing(16, 16, 0);
 gridSource.setGridOrigin(8, 8, 0);
+*/
 
-const texture = vtkTexture.newInstance();
 texture.setInterpolate(true);
 texture.setInputConnection(gridSource.getOutputPort());
 actor.addTexture(texture);
@@ -97,10 +157,9 @@ actor.addTexture(texture);
 // Re-render
 renderer.resetCamera();
 renderWindow.render();
+
 // END EXAMPMLE CODE
 
-
-function ModelViewer() {
   return (
     <div>
       <h1>Model Viewer</h1>
