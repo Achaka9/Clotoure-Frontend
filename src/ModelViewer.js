@@ -18,10 +18,12 @@ import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
 import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
 import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
 import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
-import vtkHttpDataSetReader from '@kitware/vtk.js/Sources/IO/Core/HttpDataSetReader';
 import vtkTextureMapToPlane from '@kitware/vtk.js/Filters/Texture/TextureMapToPlane';
 import vtkOpenGLPolyDataMapper$1 from '@kitware/vtk.js/Rendering/OpenGL/PolyDataMapper';
 import vtkOBJReader from '@kitware/vtk.js/IO/Misc/OBJReader';
+import vtkHttpDataSetReader from '@kitware/vtk.js/IO/Core/HttpDataSetReader';
+
+
 // Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
 
 
@@ -32,7 +34,7 @@ function ModelViewer() {
 // Standard rendering code setup
 // ----------------------------------------------------------------------------
 
-const ScreenRenderer = vtkRenderWindow.newInstance({
+const ScreenRenderer = vtkFullScreenRenderWindow.newInstance({
   background: [0, 0, 0],
 });
 const ren = ScreenRenderer.getRenderer();
@@ -82,11 +84,11 @@ map_to_model1.setInputConnection(objreader1.getOutputPort());
 
 //Create first actor
 const actor = vtkActor.newInstance();
-renderer.addActor(actor);
+ren.addActor(actor);
 
 //Create second actor
 const actor1 = vtkActor.newInstance();
-renderer.addActor(actor);
+ren.addActor(actor);
 
 // Create Mappers
 const mapper = vtkMapper.newInstance();
@@ -100,9 +102,11 @@ mapper.setInputConnection(map_to_model1.getOutputPort());
 
 actor.setMapper(mapper);
 actor.getProperty().setTexture(texture);
+actor.addTexture(texture);
 
 actor1.setMapper(mapper1);
 actor1.getProperty().setTexture(texture1);
+actor1.addTexture(texture1);
 
 /*
 // create a filter on the fly to generate tcoords from normals
@@ -151,12 +155,12 @@ gridSource.setGridOrigin(8, 8, 0);
 */
 
 texture.setInterpolate(true);
-texture.setInputConnection(gridSource.getOutputPort());
-actor.addTexture(texture);
+
+
 
 // Re-render
-renderer.resetCamera();
-renderWindow.render();
+ren.resetCamera();
+renwin.render();
 
 // END EXAMPMLE CODE
 
