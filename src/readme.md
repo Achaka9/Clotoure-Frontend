@@ -36,5 +36,5 @@ for model viewer:
 
 ```terminal
 npm install @kitware/vtk.js
-npm install kw-web-swuite --save-dev
+npm install kw-web-swuite --save-dev * DONT INSTALL THIS *
 ```
