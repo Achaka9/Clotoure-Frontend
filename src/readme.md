@@ -32,6 +32,6 @@ In the "scripts" key in the generated package.json paste the following before "t
 for model viewer:
 
 ```terminal
-npm install vtk.js
+npm install @kitware/vtk.js
 npm install kw-web-swuite --save-dev
 ```
