@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect } from 'react'; 
 
 // START EXAMPLE CODE
 import '@kitware/vtk.js/favicon';
@@ -6,7 +7,6 @@ import '@kitware/vtk.js/favicon';
 // Load the rendering pieces we want to use (for both WebGL and WebGPU)
 import '@kitware/vtk.js/Rendering/Profiles/Geometry';
 
-import vtkFullScreenRenderWindow from '@kitware/vtk.js/Rendering/Misc/FullScreenRenderWindow';
 import vtkGenericRenderWindow from '@kitware/vtk.js/Rendering/Misc/GenericRenderWindow';
 
 import macro from '@kitware/vtk.js/macros';
@@ -20,44 +20,6 @@ import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
 //import {ResizeSensor}     from 'css-element-queries'
 
 //Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
-/*
-function createVTKWindow(name, url) {
-  const container = document.querySelector(`container id from div`);
-  const background = userParams.background
-    ? options.background.split(',').map((s) => Number(s))
-    : [1, 1, 1];
-  const containerStyle = userParams.containerStyle;
-  const genericRenderWindow = vtkGenericRenderWindow.newInstance({
-    background,
-    containerStyle,
-  });
-  genericRenderWindow.setContainer(container);
-
-  const renderer = genericRenderWindow.getRenderer();
-  const renderWindow = genericRenderWindow.getRenderWindow();
-
-  const camera = renderer.getActiveCamera()
-  renderer.setActiveCamera(window.camera);
-
-  fetch(url)
-    .then(resp => resp.blob())
-    .then(blob => {
-      onDownloaded(container, renderer, renderWindow, blob, function () {
-        $("#loader").remove();
-      });
-    })
-    .catch(() => {
-      console.log('Error retrieving data..')
-      $("#loader").remove();
-    });
-
-  return {
-    renderer: renderer,
-    renderWindow: renderWindow
-  };
-}
-window.createVTKWindow = createVTKWindow;
-  */
 
   function ModelViewer() {
 
@@ -65,30 +27,18 @@ window.createVTKWindow = createVTKWindow;
     // ----------------------------------------------------------------------------
     // Standard rendering code setup
     // ----------------------------------------------------------------------------
-/*
-    const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({
-      background: [0, 0, 0],
-    });
-    const renderer = fullScreenRenderer.getRenderer();
-    const renderWindow = fullScreenRenderer.getRenderWindow();
-*/
-  /*
-    const genericRenderer = vtkGenericRenderWindow.newInstance({
-      background: [0, 0, 0],
-      width: '50%',
-      height: '50%',
-      top: '50%'
-    });
-    //genericRenderer.setContainer(null);
-    //genericRenderer.resize();
+ 
+    //container: { justifyContent: 'center', alignItems: 'center', position:'relative'}
 
-    const renderer = genericRenderer.getRenderer();
-    const renderWindow = genericRenderer.getRenderWindow();
-*/
-   
     //First, Initialize Renderer
-    const container = document.querySelector('#mainViewer');
+    //const container = document.querySelector('#mainViewer');
+
+    useEffect(() => {
+    const container = document.createElement('div');
+    container.id = 'mainViewer';
+    document.body.appendChild(container);
     const genericRenderWindow = vtkGenericRenderWindow.newInstance();
+
 
     // VTK renderWindow/renderer
     const renderWindow = genericRenderWindow.getRenderWindow();
@@ -97,7 +47,7 @@ window.createVTKWindow = createVTKWindow;
     genericRenderWindow.setContainer(container);
         //not properly working on microsoft edge,, there is no standard for handling resize event
        // new ResizeSensor(container, genericRenderWindow.resize);
-        genericRenderWindow.resize();
+    genericRenderWindow.resize();
 
     
     // ----------------------------------------------------------------------------
@@ -166,13 +116,24 @@ window.createVTKWindow = createVTKWindow;
     // Re-render
     renderer.resetCamera();
     renderWindow.render();
-    // END EXAMPMLE CODE
+      // END EXAMPMLE CODE
+      
+    return () => {
+      document.body.removeChild(container);
+    };
+  }, []); 
+
+    
     return (
       <div>
         <h1>Model Viewer</h1>
         <p>This is the Model Viewer.</p>
+        <div id="mainViewer" class="ui-widget-content" float= "right" width= "800px" max-height= "10%" background-color= "#000" boarder = "none" margin= "0 5px">  
+          </div>
       </div>
+      
     );
+    
   }
 
 
