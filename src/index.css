@@ -11,3 +11,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+#mainViewer{
+  float: right;
+  width: 800px;
+  background-color: #000;
+  border: none;
+  margin: 0 5px;
+}

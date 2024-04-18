@@ -7,6 +7,7 @@ import '@kitware/vtk.js/favicon';
 import '@kitware/vtk.js/Rendering/Profiles/Geometry';
 
 import vtkFullScreenRenderWindow from '@kitware/vtk.js/Rendering/Misc/FullScreenRenderWindow';
+import vtkGenericRenderWindow from '@kitware/vtk.js/Rendering/Misc/GenericRenderWindow';
 
 import macro from '@kitware/vtk.js/macros';
 import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
@@ -16,95 +17,163 @@ import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
 import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
 import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
 import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
+//import {ResizeSensor}     from 'css-element-queries'
 
 //Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
+/*
+function createVTKWindow(name, url) {
+  const container = document.querySelector(`container id from div`);
+  const background = userParams.background
+    ? options.background.split(',').map((s) => Number(s))
+    : [1, 1, 1];
+  const containerStyle = userParams.containerStyle;
+  const genericRenderWindow = vtkGenericRenderWindow.newInstance({
+    background,
+    containerStyle,
+  });
+  genericRenderWindow.setContainer(container);
 
-// ----------------------------------------------------------------------------
-// Standard rendering code setup
-// ----------------------------------------------------------------------------
+  const renderer = genericRenderWindow.getRenderer();
+  const renderWindow = genericRenderWindow.getRenderWindow();
 
-const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({
-  background: [0, 0, 0],
-});
-const renderer = fullScreenRenderer.getRenderer();
-const renderWindow = fullScreenRenderer.getRenderWindow();
+  const camera = renderer.getActiveCamera()
+  renderer.setActiveCamera(window.camera);
 
-// ----------------------------------------------------------------------------
-// Example code
-// ----------------------------------------------------------------------------
-
-const actor = vtkActor.newInstance();
-renderer.addActor(actor);
-
-const mapper = vtkMapper.newInstance();
-actor.setMapper(mapper);
-
-const sphereSource = vtkSphereSource.newInstance();
-sphereSource.setThetaResolution(64);
-sphereSource.setPhiResolution(32);
-
-// create a filter on the fly to generate tcoords from normals
-const tcoordFilter = macro.newInstance((publicAPI, model) => {
-  macro.obj(publicAPI, model); // make it an object
-  macro.algo(publicAPI, model, 1, 1); // mixin algorithm code 1 in, 1 out
-  publicAPI.requestData = (inData, outData) => {
-    // implement requestData
-    if (!outData[0] || inData[0].getMTime() > outData[0].getMTime()) {
-      // use the normals to generate tcoords :-)
-      const norms = inData[0].getPointData().getNormals();
-
-      const newArray = new Float32Array(norms.getNumberOfTuples() * 2);
-      const ndata = norms.getData();
-      for (let i = 0; i < newArray.length; i += 2) {
-        newArray[i] =
-          Math.abs(Math.atan2(ndata[(i / 2) * 3], ndata[(i / 2) * 3 + 1])) /
-          3.1415927;
-        newArray[i + 1] = Math.asin(ndata[(i / 2) * 3 + 2] / 3.1415927) + 0.5;
-      }
-
-      const da = vtkDataArray.newInstance({
-        numberOfComponents: 2,
-        values: newArray,
+  fetch(url)
+    .then(resp => resp.blob())
+    .then(blob => {
+      onDownloaded(container, renderer, renderWindow, blob, function () {
+        $("#loader").remove();
       });
-      da.setName('tcoord');
+    })
+    .catch(() => {
+      console.log('Error retrieving data..')
+      $("#loader").remove();
+    });
 
-      const pd = vtkPolyData.newInstance();
-      pd.setPolys(inData[0].getPolys());
-      pd.setPoints(inData[0].getPoints());
-      const cpd = pd.getPointData();
-      cpd.addArray(da);
-      cpd.setActiveTCoords(da.getName());
-      outData[0] = pd;
-    }
+  return {
+    renderer: renderer,
+    renderWindow: renderWindow
   };
-})();
-
-tcoordFilter.setInputConnection(sphereSource.getOutputPort());
-mapper.setInputConnection(tcoordFilter.getOutputPort());
-
-const gridSource = vtkImageGridSource.newInstance();
-gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
-gridSource.setGridSpacing(16, 16, 0);
-gridSource.setGridOrigin(8, 8, 0);
-
-const texture = vtkTexture.newInstance();
-texture.setInterpolate(true);
-texture.setInputConnection(gridSource.getOutputPort());
-actor.addTexture(texture);
-
-// Re-render
-renderer.resetCamera();
-renderWindow.render();
-// END EXAMPMLE CODE
-
-function ModelViewer() {
-  return (
-    <div>
-      <h1>Model Viewer</h1>
-      <p>This is the Model Viewer.</p>
-    </div>
-  );
 }
+window.createVTKWindow = createVTKWindow;
+  */
+
+  function ModelViewer() {
+
+  
+    // ----------------------------------------------------------------------------
+    // Standard rendering code setup
+    // ----------------------------------------------------------------------------
+/*
+    const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({
+      background: [0, 0, 0],
+    });
+    const renderer = fullScreenRenderer.getRenderer();
+    const renderWindow = fullScreenRenderer.getRenderWindow();
+*/
+  /*
+    const genericRenderer = vtkGenericRenderWindow.newInstance({
+      background: [0, 0, 0],
+      width: '50%',
+      height: '50%',
+      top: '50%'
+    });
+    //genericRenderer.setContainer(null);
+    //genericRenderer.resize();
+
+    const renderer = genericRenderer.getRenderer();
+    const renderWindow = genericRenderer.getRenderWindow();
+*/
+   
+    //First, Initialize Renderer
+    const container = document.querySelector('#mainViewer');
+    const genericRenderWindow = vtkGenericRenderWindow.newInstance();
+
+    // VTK renderWindow/renderer
+    const renderWindow = genericRenderWindow.getRenderWindow();
+    const  renderer = genericRenderWindow.getRenderer();
+    renderer.setBackground(0.0, 0.05, 0.0);
+    genericRenderWindow.setContainer(container);
+        //not properly working on microsoft edge,, there is no standard for handling resize event
+       // new ResizeSensor(container, genericRenderWindow.resize);
+        genericRenderWindow.resize();
+
+    
+    // ----------------------------------------------------------------------------
+    // Example code
+    // ----------------------------------------------------------------------------
+
+    const actor = vtkActor.newInstance();
+    renderer.addActor(actor);
+
+    const mapper = vtkMapper.newInstance();
+    actor.setMapper(mapper);
+
+    const sphereSource = vtkSphereSource.newInstance();
+    sphereSource.setThetaResolution(64);
+    sphereSource.setPhiResolution(32);
+
+    // create a filter on the fly to generate tcoords from normals
+    const tcoordFilter = macro.newInstance((publicAPI, model) => {
+      macro.obj(publicAPI, model); // make it an object
+      macro.algo(publicAPI, model, 1, 1); // mixin algorithm code 1 in, 1 out
+      publicAPI.requestData = (inData, outData) => {
+        // implement requestData
+        if (!outData[0] || inData[0].getMTime() > outData[0].getMTime()) {
+          // use the normals to generate tcoords :-)
+          const norms = inData[0].getPointData().getNormals();
+
+          const newArray = new Float32Array(norms.getNumberOfTuples() * 2);
+          const ndata = norms.getData();
+          for (let i = 0; i < newArray.length; i += 2) {
+            newArray[i] =
+              Math.abs(Math.atan2(ndata[(i / 2) * 3], ndata[(i / 2) * 3 + 1])) /
+              3.1415927;
+            newArray[i + 1] = Math.asin(ndata[(i / 2) * 3 + 2] / 3.1415927) + 0.5;
+          }
+
+          const da = vtkDataArray.newInstance({
+            numberOfComponents: 2,
+            values: newArray,
+          });
+          da.setName('tcoord');
+
+          const pd = vtkPolyData.newInstance();
+          pd.setPolys(inData[0].getPolys());
+          pd.setPoints(inData[0].getPoints());
+          const cpd = pd.getPointData();
+          cpd.addArray(da);
+          cpd.setActiveTCoords(da.getName());
+          outData[0] = pd;
+        }
+      };
+    })();
+
+    tcoordFilter.setInputConnection(sphereSource.getOutputPort());
+    mapper.setInputConnection(tcoordFilter.getOutputPort());
+
+    const gridSource = vtkImageGridSource.newInstance();
+    gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
+    gridSource.setGridSpacing(16, 16, 0);
+    gridSource.setGridOrigin(8, 8, 0);
+
+    const texture = vtkTexture.newInstance();
+    texture.setInterpolate(true);
+    texture.setInputConnection(gridSource.getOutputPort());
+    actor.addTexture(texture);
+
+    // Re-render
+    renderer.resetCamera();
+    renderWindow.render();
+    // END EXAMPMLE CODE
+    return (
+      <div>
+        <h1>Model Viewer</h1>
+        <p>This is the Model Viewer.</p>
+      </div>
+    );
+  }
 
 
 
