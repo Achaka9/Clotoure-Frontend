@@ -10,8 +10,11 @@ npm init
 
 Next Paste and run this script into terminal
 
-```terminalea
-npm install react react-dom react-scripts react-webcam web-vitals axios
+
+```
+npm install react react-dom react-scripts react-webcam web-vitals axios react-bootstrap bootstrap react-router-dom
+npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
+
 ```
 
 In the "scripts" key in the generated package.json paste the following before "test":

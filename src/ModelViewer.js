@@ -1,8 +1,13 @@
+import React from 'react';
+
+// START EXAMPLE CODE
 import '@kitware/vtk.js/favicon';
 
 // Load the rendering pieces we want to use (for both WebGL and WebGPU)
 import '@kitware/vtk.js/Rendering/Profiles/Geometry';
 
+import vtkFullScreenRenderWindow from '@kitware/vtk.js/Rendering/Misc/FullScreenRenderWindow';
+import GenericRenderWindow from '@kitware/vtk.js/Rendering/Misc/GenericRenderWindow';
 import { strFromU8, unzipSync } from 'fflate';
 
 import macro from '@kitware/vtk.js/macros';
@@ -15,6 +20,17 @@ import { fromArrayBuffer } from '@kitware/vtk.js/Common/Core/Base64';
 import vtkOBJReader from '@kitware/vtk.js/IO/Misc/OBJReader';
 import vtkMTLReader from '@kitware/vtk.js/IO/Misc/MTLReader';
 import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
+import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
+import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
+import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
+
+//Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
+
+function ModelViewer() {
+  
+// ----------------------------------------------------------------------------
+// Standard rendering code setup
+// ----------------------------------------------------------------------------
 import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
 
 // Force DataAccessHelper to have access to various data source
@@ -228,6 +244,26 @@ export function initLocalFileLoader(container) { //SEARCH FOR LOCAL
       const ext = files[0].name.split('.').slice(-1)[0];
       load(myContainer, { file: files[0], ext });
     }
+  };
+})();
+
+tcoordFilter.setInputConnection(sphereSource.getOutputPort());
+mapper.setInputConnection(tcoordFilter.getOutputPort());
+
+const gridSource = vtkImageGridSource.newInstance();
+gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
+gridSource.setGridSpacing(16, 16, 0);
+gridSource.setGridOrigin(8, 8, 0);
+
+const texture = vtkTexture.newInstance();
+texture.setInterpolate(true);
+texture.setInputConnection(gridSource.getOutputPort());
+actor.addTexture(texture);
+
+// Re-render
+renderer.resetCamera();
+renderWindow.render();
+// END EXAMPMLE CODE
   }
 
   fileInput.addEventListener('change', handleFile);
