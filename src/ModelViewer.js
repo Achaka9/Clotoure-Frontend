@@ -49,7 +49,7 @@ function emptyContainer(container) {
   }
 }
 
-function unpack(zipContent) {
+function unpack(zipContent) { // NOT USING ZIP FILES
   if (zipContent instanceof Blob) {
     return zipContent.arrayBuffer().then((ab) => new Uint8Array(ab));
   }
@@ -59,7 +59,7 @@ function unpack(zipContent) {
   return Promise.reject(new Error('invalid zip content'));
 }
 
-function loadZipContent(zipContent, renderWindow, renderer) {
+function loadZipContent(zipContent, renderWindow, renderer) { // NOT USING ZIP FILES
   const fileContents = { obj: {}, mtl: {}, img: {} };
   unpack(zipContent).then((zipArrayBuffer) => {
     const decompressedFiles = unzipSync(new Uint8Array(zipArrayBuffer));
@@ -145,7 +145,7 @@ export function load(container, options) { //CREATE RENDER WINDOW
   const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({
     background: [1, 0, 0],
     rootContainer: container,
-    containerStyle: { height: '50%', width: '50%',  marginLeft: '1000px',},
+    containerStyle: { height: '50%', width: '50%',  position: 'relative',},
   });
   const renderer = fullScreenRenderer.getRenderer();
   const renderWindow = fullScreenRenderer.getRenderWindow();
