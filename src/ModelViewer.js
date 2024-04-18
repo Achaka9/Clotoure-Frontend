@@ -1,173 +1,274 @@
-import React from 'react';
-
-
-
-// START EXAMPLE CODE
 import '@kitware/vtk.js/favicon';
 
 // Load the rendering pieces we want to use (for both WebGL and WebGPU)
 import '@kitware/vtk.js/Rendering/Profiles/Geometry';
 
-import vtkFullScreenRenderWindow from '@kitware/vtk.js/Rendering/Misc/FullScreenRenderWindow';
+import { strFromU8, unzipSync } from 'fflate';
 
 import macro from '@kitware/vtk.js/macros';
-import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
-import vtkDataArray from '@kitware/vtk.js/Common/Core/DataArray';
-import vtkImageGridSource from '@kitware/vtk.js/Filters/Sources/ImageGridSource';
-import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
-import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
-import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
-import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
-import vtkTextureMapToPlane from '@kitware/vtk.js/Filters/Texture/TextureMapToPlane';
-import vtkOpenGLPolyDataMapper$1 from '@kitware/vtk.js/Rendering/OpenGL/PolyDataMapper';
+
+import HttpDataAccessHelper from '@kitware/vtk.js/IO/Core/DataAccessHelper/HttpDataAccessHelper';
+import vtkFullScreenRenderWindow from '@kitware/vtk.js/Rendering/Misc/FullScreenRenderWindow';
+import vtkURLExtract from '@kitware/vtk.js/Common/Core/URLExtract';
+import { fromArrayBuffer } from '@kitware/vtk.js/Common/Core/Base64';
+
 import vtkOBJReader from '@kitware/vtk.js/IO/Misc/OBJReader';
-import vtkHttpDataSetReader from '@kitware/vtk.js/IO/Core/HttpDataSetReader';
+import vtkMTLReader from '@kitware/vtk.js/IO/Misc/MTLReader';
+import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
+import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
 
+// Force DataAccessHelper to have access to various data source
+import '@kitware/vtk.js/IO/Core/DataAccessHelper/HtmlDataAccessHelper';
+import '@kitware/vtk.js/IO/Core/DataAccessHelper/JSZipDataAccessHelper';
 
-// Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
+import style from './OBJViewer.module.css';
 
+const iOS = /iPad|iPhone|iPod/.test(window.navigator.platform);
+let autoInit = true;
 
+// Look at URL an see if we should load a file
+// ?fileURL=https://data.kitware.com/api/v1/item/59cdbb588d777f31ac63de08/download
+// &noInterpolation
 
-function ModelViewer() {
+const userParams = vtkURLExtract.extractURLParameters();
 
-// ----------------------------------------------------------------------------
-// Standard rendering code setup
-// ----------------------------------------------------------------------------
+// Add class to body if iOS device --------------------------------------------
 
-const ScreenRenderer = vtkFullScreenRenderWindow.newInstance({
-  background: [0, 0, 0],
-});
-const ren = ScreenRenderer.getRenderer();
-const renwin = ScreenRenderer.getRenderWindow();
+if (iOS) {
+  document.querySelector('body').classList.add('is-ios-device');
+}
 
-// ----------------------------------------------------------------------------
-// Example code
-// ----------------------------------------------------------------------------
+function preventDefaults(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
 
-// front image reader
-const reader = vtkHttpDataSetReader.newInstance({
-  fetchGzip: false, // Set to true if the data is gzip compressed
-});
+function emptyContainer(container) {
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+}
 
-const url = 'path_to_your_jpeg_image.jpg';
-reader.setUrl(url);
+function unpack(zipContent) {
+  if (zipContent instanceof Blob) {
+    return zipContent.arrayBuffer().then((ab) => new Uint8Array(ab));
+  }
+  if (zipContent instanceof ArrayBuffer) {
+    return Promise.resolve(new Uint8Array(zipContent));
+  }
+  return Promise.reject(new Error('invalid zip content'));
+}
 
-// back image reader
-const reader1 = vtkHttpDataSetReader.newInstance({
-  fetchGzip: false, // Set to true if the data is gzip compressed
-});
+function loadZipContent(zipContent, renderWindow, renderer) {
+  const fileContents = { obj: {}, mtl: {}, img: {} };
+  unpack(zipContent).then((zipArrayBuffer) => {
+    const decompressedFiles = unzipSync(new Uint8Array(zipArrayBuffer));
 
-const url1 = 'path_to_your_jpeg_image.jpg';
-reader.setUrl(url1);
-
-const objreader = vtkOBJReader.newInstance()
-objreader.setUrl('path_to_obj1.obj')
-
-const objreader1 = vtkOBJReader.newInstance()
-objreader1.setUrl('path_to_obj2.obj')
-
-//Create Texture object
-const texture = vtkTexture.newInstance();
-texture.setInputConnection(reader.getOutputPort());
-
-//Create second texture object
-const texture1 = vtkTexture.newInstance();
-texture1.setInputConnection(reader1.getOutputPort());
-
-//MapToModel
-const map_to_model = vtkTextureMapToPlane().newInstance();
-map_to_model.setInputConnection(objreader.getOutputPort());
-
-const map_to_model1 = vtkTextureMapToPlane().newInstance();
-map_to_model1.setInputConnection(objreader1.getOutputPort());
-
-
-//Create first actor
-const actor = vtkActor.newInstance();
-ren.addActor(actor);
-
-//Create second actor
-const actor1 = vtkActor.newInstance();
-ren.addActor(actor);
-
-// Create Mappers
-const mapper = vtkMapper.newInstance();
-const mapper1 = vtkMapper.newInstance();
-
-// Set Mappers to actors
-// set textures to actors
-
-mapper1.setInputConnection(map_to_model.getOutputPort());
-mapper.setInputConnection(map_to_model1.getOutputPort());
-
-actor.setMapper(mapper);
-actor.getProperty().setTexture(texture);
-actor.addTexture(texture);
-
-actor1.setMapper(mapper1);
-actor1.getProperty().setTexture(texture1);
-actor1.addTexture(texture1);
-
-/*
-// create a filter on the fly to generate tcoords from normals
-const tcoordFilter = macro.newInstance((publicAPI, model) => {
-  macro.obj(publicAPI, model); // make it an object
-  macro.algo(publicAPI, model, 1, 1); // mixin algorithm code 1 in, 1 out
-  publicAPI.requestData = (inData, outData) => {
-    // implement requestData
-    if (!outData[0] || inData[0].getMTime() > outData[0].getMTime()) {
-      // use the normals to generate tcoords :-)
-      const norms = inData[0].getPointData().getNormals();
-
-      const newArray = new Float32Array(norms.getNumberOfTuples() * 2);
-      const ndata = norms.getData();
-      for (let i = 0; i < newArray.length; i += 2) {
-        newArray[i] =
-          Math.abs(Math.atan2(ndata[(i / 2) * 3], ndata[(i / 2) * 3 + 1])) /
-          3.1415927;
-        newArray[i + 1] = Math.asin(ndata[(i / 2) * 3 + 2] / 3.1415927) + 0.5;
-      }
-
-      const da = vtkDataArray.newInstance({
-        numberOfComponents: 2,
-        values: newArray,
+    function done() {
+      // Attach images to MTLs
+      const promises = [];
+      Object.keys(fileContents.mtl).forEach((mtlFilePath) => {
+        const mtlReader = fileContents.mtl[mtlFilePath];
+        const basePath = mtlFilePath
+          .split('/')
+          .filter((v, i, a) => i < a.length - 1)
+          .join('/');
+        mtlReader.listImages().forEach((relPath) => {
+          const key = basePath.length ? `${basePath}/${relPath}` : relPath;
+          const imgSRC = fileContents.img[key];
+          if (imgSRC) {
+            promises.push(mtlReader.setImageSrc(relPath, imgSRC));
+            console.log('register promise');
+          }
+        });
       });
-      da.setName('tcoord');
 
-      const pd = vtkPolyData.newInstance();
-      pd.setPolys(inData[0].getPolys());
-      pd.setPoints(inData[0].getPoints());
-      const cpd = pd.getPointData();
-      cpd.addArray(da);
-      cpd.setActiveTCoords(da.getName());
-      outData[0] = pd;
+      Promise.all(promises).then(() => {
+        console.log('load obj...');
+        // Create pipeline from obj
+        Object.keys(fileContents.obj).forEach((objFilePath) => {
+          const mtlFilePath = objFilePath.replace(/\.obj$/, '.mtl');
+          const objReader = fileContents.obj[objFilePath];
+          const mtlReader = fileContents.mtl[mtlFilePath];
+
+          const size = objReader.getNumberOfOutputPorts();
+          for (let i = 0; i < size; i++) {
+            const source = objReader.getOutputData(i);
+            const mapper = vtkMapper.newInstance();
+            const actor = vtkActor.newInstance();
+            const name = source.get('name').name;
+
+            actor.setMapper(mapper);
+            mapper.setInputData(source);
+            renderer.addActor(actor);
+
+            if (mtlReader && name) {
+              mtlReader.applyMaterialToActor(name, actor);
+            }
+          }
+        });
+        renderer.resetCamera();
+        renderWindow.render();
+      });
     }
-  };
-})();
 
-tcoordFilter.setInputConnection(sphereSource.getOutputPort());
+    Object.entries(decompressedFiles).forEach(([relativePath, fileData]) => {
+      if (relativePath.match(/\.obj$/i)) {
+        const txt = strFromU8(fileData);
+        const reader = vtkOBJReader.newInstance({ splitMode: 'usemtl' });
+        reader.parseAsText(txt);
+        fileContents.obj[relativePath] = reader;
+      }
+      if (relativePath.match(/\.mtl$/i)) {
+        const txt = strFromU8(fileData);
+        const reader = vtkMTLReader.newInstance({
+          interpolateTextures: !userParams.noInterpolation,
+        });
+        reader.parseAsText(txt);
+        fileContents.mtl[relativePath] = reader;
+      }
+      if (relativePath.match(/\.jpg$/i) || relativePath.match(/\.png$/i)) {
+        const txt = fromArrayBuffer(fileData);
+        const ext = relativePath.slice(-3).toLowerCase();
+        fileContents.img[relativePath] = `data:image/${ext};base64,${txt}`;
+      }
+    });
 
+    done();
+  });
+}
 
-const gridSource = vtkImageGridSource.newInstance();
-gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
-gridSource.setGridSpacing(16, 16, 0);
-gridSource.setGridOrigin(8, 8, 0);
-*/
+export function load(container, options) { //CREATE RENDER WINDOW
+  autoInit = false;
+  emptyContainer(container);
 
-texture.setInterpolate(true);
+  const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({
+    background: [1, 0, 0],
+    rootContainer: container,
+    containerStyle: { height: '50%', width: '50%',  marginLeft: '1000px',},
+  });
+  const renderer = fullScreenRenderer.getRenderer();
+  const renderWindow = fullScreenRenderer.getRenderWindow();
 
+  if (options.file) {
+    if (options.ext === 'obj') {
+      const reader = new FileReader();
+      reader.onload = function onLoad(e) {
+        const objReader = vtkOBJReader.newInstance();
+        objReader.parseAsText(reader.result);
+        const nbOutputs = objReader.getNumberOfOutputPorts();
+        for (let idx = 0; idx < nbOutputs; idx++) {
+          const source = objReader.getOutputData(idx);
+          const mapper = vtkMapper.newInstance();
+          const actor = vtkActor.newInstance();
+          actor.setMapper(mapper);
+          mapper.setInputData(source);
+          renderer.addActor(actor);
+        }
+        renderer.resetCamera();
+        renderWindow.render();
+      };
+      reader.readAsText(options.file);
+    } else {
+      loadZipContent(options.file, renderWindow, renderer);
+    }
+  } else if (options.fileURL) {
+    const progressContainer = document.createElement('div');
+    progressContainer.setAttribute('class', style.progress);
+    container.appendChild(progressContainer);
 
+    const progressCallback = (progressEvent) => {
+      if (progressEvent.lengthComputable) {
+        const percent = Math.floor(
+          (100 * progressEvent.loaded) / progressEvent.total
+        );
+        progressContainer.innerHTML = `Loading ${percent}%`;
+      } else {
+        progressContainer.innerHTML = macro.formatBytesToProperUnit(
+          progressEvent.loaded
+        );
+      }
+    };
 
-// Re-render
-ren.resetCamera();
-renwin.render();
+    HttpDataAccessHelper.fetchBinary(options.fileURL, {
+      progressCallback,
+    }).then((content) => {
+      container.removeChild(progressContainer);
+      loadZipContent(content, renderWindow, renderer);
+    });
+  }
+}
 
-// END EXAMPMLE CODE
+export function initLocalFileLoader(container) { //SEARCH FOR LOCAL
+  const exampleContainer = document.querySelector('.content');
+  const rootBody = document.querySelector('body');
+  const myContainer = container || exampleContainer || rootBody;
 
+  if (myContainer !== container) {
+    myContainer.classList.add(style.fullScreen);
+    rootBody.style.margin = '0';
+    rootBody.style.padding = '0';
+  } else {
+    rootBody.style.margin = '0';
+    rootBody.style.padding = '0';
+  }
+
+  const fileContainer = document.createElement('div');
+  fileContainer.innerHTML = `<div class="${style.bigFileDrop}"/><input type="file" accept=".zip,.obj" style="display: none;"/>`;
+  myContainer.appendChild(fileContainer);
+
+  const fileInput = fileContainer.querySelector('input');
+
+  function handleFile(e) {
+    preventDefaults(e);
+    const dataTransfer = e.dataTransfer;
+    const files = e.target.files || dataTransfer.files;
+    if (files.length === 1) {
+      myContainer.removeChild(fileContainer);
+      const ext = files[0].name.split('.').slice(-1)[0];
+      load(myContainer, { file: files[0], ext });
+    }
+  }
+
+  fileInput.addEventListener('change', handleFile);
+  fileContainer.addEventListener('drop', handleFile);
+  fileContainer.addEventListener('click', (e) => fileInput.click());
+  fileContainer.addEventListener('dragover', preventDefaults);
+}
+
+if (userParams.url || userParams.fileURL) {
+  const exampleContainer = document.querySelector('.content');
+  const rootBody = document.querySelector('body');
+  const myContainer = exampleContainer || rootBody;
+  if (myContainer) {
+    myContainer.classList.add(style.fullScreen);
+    rootBody.style.margin = '0';
+    rootBody.style.padding = '0';
+  }
+  load(myContainer, userParams);
+}
+
+// Auto setup if no method get called within 100ms
+setTimeout(() => {
+  if (autoInit) {
+    // load(myContainer, { file: files[0], ext }); FIX THIS TO INIT WITH OBJ MODEL ALREADY LOADED
+
+    initLocalFileLoader();
+  }
+}, 100);
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+export function ModelViewer() {
   return (
     <div>
-      <h1>Model Viewer</h1>
-      <p>This is the Model Viewer.</p>
+      <h1>ModelViewer</h1>
+      <p>Welcome to the model viewer. Choose one of the options:</p>
+      <ul>
+        <li><Link to="/HomePage">Go to HomePage</Link></li>
+        <li><Link to="/tutorial">View Tutorial</Link></li>
+      </ul>
     </div>
   );
 }
