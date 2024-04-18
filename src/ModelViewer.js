@@ -260,7 +260,7 @@ setTimeout(() => {
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-export function ModelViewer() {
+export function ModelViewer() { //OPTIONS
   return (
     <div>
       <h1>ModelViewer</h1>
