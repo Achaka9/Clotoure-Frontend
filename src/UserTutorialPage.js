@@ -1,4 +1,5 @@
 import React from 'react';
+import photoUploadPageImage from './photoUploadPageImage'; //Import image for the photo upload
 import shirtImage from './shirt.jpg'; //Import image for the shirt
 import pantsImage from '/.pants.jpg'; //Import image for the pants
 import frontImagephoto from './front_photo.jpg'; //Import image for the front photo 
