@@ -6,6 +6,7 @@ import frontImagephoto from './front_photo.jpg'; //Import image for the front ph
 import backImagephoto from './back_photo.jpg'; //Import image for the back photo 
 import segmentImage from './segment.jpg'; //Import image for the segment step
 
+
 function UserTutorialPage() {
   return (
     <div>
