@@ -1,9 +1,11 @@
 import React from 'react';
-import shirtImage from './UserTutorialImages/shirt.jpg'; //Import image for the shirt
-import pantsImage from './UserTutorialImages/pants.jpg'; //Import image for the pants
-import frontImagephoto from './UserTutorialImages/front_photo.jpg'; //Import image for the front photo 
-import backImagephoto from './UserTutorialImages/back_photo.jpg'; //Import image for the back photo 
-import segmentImage from './UserTutorialImages/segment.jpg'; //Import image for the segment step
+import photoUploadPageImage from './photoUploadPageImage'; //Import image for the photo upload
+import shirtImage from './shirt.jpg'; //Import image for the shirt
+import pantsImage from '/.pants.jpg'; //Import image for the pants
+import frontImagephoto from './front_photo.jpg'; //Import image for the front photo 
+import backImagephoto from './back_photo.jpg'; //Import image for the back photo 
+import segmentImage from './segment.jpg'; //Import image for the segment step
+
 
 function UserTutorialPage() {
   return (
