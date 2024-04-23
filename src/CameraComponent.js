@@ -6,8 +6,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import shirtOutline from './cameraOutlines/shirt_outline1.png'; // Assuming you have imported the image correctly
-import backShirtOutline from './cameraOutlines/shirt_outline.png';
+import shirtOutline from './cameraOutlines/shirt_front_Outline.png'; // Assuming you have imported the image correctly
+import backShirtOutline from './cameraOutlines/Shirt_back_Outline.png';
 // import frontDressShirtOutline from './cameraOutlines/dress_shirt_outline1';
 // import backDressShirtOutline from './cameraOutlines/dress_shirt_outline2';
 // import frontPants from './cameraOutlines/pants_outline1';
@@ -150,11 +150,11 @@ function CameraComponent() {
           audio={false}
           ref={webcamRef}
           screenshotFormat="image/jpeg"
-          videoConstraints={{ width: 800, height: 600, facingMode: "user" }}
+          videoConstraints={{ width: 250, height: 240, facingMode: "user" }}
           style={{ position: 'absolute', width: '100%', height: '100%' }}
         />
         {isDisabled && <img
-          src={clothingOutline[0]}
+          src={clothingOutline[1]}
           style={{
             position: 'absolute',
             top: '50%',
@@ -167,7 +167,7 @@ function CameraComponent() {
           }}
         />} 
         {isDis && <img
-            src={clothingOutline[1]}
+            src={clothingOutline[0]}
             style={{
               position: 'absolute',
               top: '50%',
