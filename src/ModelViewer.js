@@ -19,7 +19,7 @@ import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
 import vtkHttpDataSetReader from '@kitware/vtk.js/IO/Core/HttpDataSetReader';
 import vtkTextureMapToPlane from '@kitware/vtk.js/Filters/Texture/TextureMapToPlane';
 import vtkTextureMapToSphere from '@kitware/vtk.js/Filters/Texture/TextureMapToSphere';
-
+import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
 // Force DataAccessHelper to have access to various data source
 import '@kitware/vtk.js/IO/Core/DataAccessHelper/HtmlDataAccessHelper';
 import '@kitware/vtk.js/IO/Core/DataAccessHelper/JSZipDataAccessHelper';
@@ -70,20 +70,22 @@ function load(container, options) { //CREATE RENDER WINDOW
       const reader = new FileReader();
       reader.onload = function onLoad(e) {
         const objReader = vtkOBJReader.newInstance();
-        const imageReader = vtkHttpDataSetReader.newInstance();
+        const imageReader = new FileReader();
         const imageURL = './assets/panda.jpg';
-        imageReader.setUrl(url);
+        fetch(imageURL)
         objReader.parseAsText(reader.result);
         const nbOutputs = objReader.getNumberOfOutputPorts();
         for (let idx = 0; idx < nbOutputs; idx++) {
           const source = objReader.getOutputData(idx);
           const mapper = vtkMapper.newInstance();
+          const texture = vtkTexture.newInstance();
           const actor = vtkActor.newInstance();
           const map_to_model = vtkTextureMapToPlane.newInstance();
           map_to_model.setInputConnection(objReader.getOutputPort());
           actor.setMapper(mapper);
           mapper.setInputData(source);
           mapper.setInputConnection(map_to_model.getOutputPort());
+          actor.addTexture(texture);
           renderer.addActor(actor);
         }
         renderer.resetCamera();
