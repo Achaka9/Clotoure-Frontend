@@ -32,3 +32,15 @@ code {
   background-color: #000;
   border: 10px solid #603d38;
 }
+
+/*
+#subViewer{
+  position: absolute;
+  top: 60%;  /* 50% from the top *
+  left: 80%; /* 50% from the left *
+  transform: translate(-50%, -50%); 
+  background-color: #000;
+  border: 10px solid #603d38;
+  margin: 0 5px;
+}
+*/

@@ -1,8 +1,9 @@
 import React from 'react';
-import { useEffect } from 'react'; 
+import { useState, useRef, useEffect } from 'react'; 
 
 // START EXAMPLE CODE
 import '@kitware/vtk.js/favicon';
+import Box from '@mui/material/Box';
 
 // Load the rendering pieces we want to use (for both WebGL and WebGPU)
 import '@kitware/vtk.js/Rendering/Profiles/Geometry';
@@ -17,9 +18,90 @@ import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
 import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
 import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
 import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
+import vtkConeSource      from '@kitware/vtk.js/Filters/Sources/ConeSource';
 //import {ResizeSensor}     from 'css-element-queries'
 
 //Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
+
+function VTK() {
+  const vtkContainerRef = useRef(null);
+  const context = useRef(null);
+  const [coneResolution, setConeResolution] = useState(6);
+    const [representation, setRepresentation] = useState(2);
+
+    
+  useEffect(() => {
+    if (!context.current) {
+       const container = document.createElement('div');
+      container.id = 'mainViewer';
+      document.body.appendChild(container);
+    const genericRenderWindow = vtkGenericRenderWindow.newInstance({
+        rootContainer: vtkContainerRef.current,
+      });
+      
+      const coneSource = vtkConeSource.newInstance({ height: 1.0 });
+
+      const mapper = vtkMapper.newInstance();
+      mapper.setInputConnection(coneSource.getOutputPort());
+
+      const actor = vtkActor.newInstance();
+      actor.setMapper(mapper);
+
+    const renderWindow = genericRenderWindow.getRenderWindow();
+    const  renderer = genericRenderWindow.getRenderer();
+    renderer.setBackground(0.0, 0.05, 0.0);
+    genericRenderWindow.setContainer(container);
+    genericRenderWindow.resize();
+
+      renderer.addActor(actor);
+      renderer.resetCamera();
+      renderWindow.render();
+
+      context.current = {
+        genericRenderWindow,
+        renderWindow,
+        renderer,
+        coneSource,
+        actor,
+        mapper,
+      };
+    }
+
+    return () => {
+      if (context.current) {
+        const { genericRenderWindow, coneSource, actor, mapper } = context.current;
+        actor.delete();
+        mapper.delete();
+        coneSource.delete();
+        genericRenderWindow.delete();
+        context.current = null;
+      }
+    };
+  }, [vtkContainerRef]);
+
+  useEffect(() => {
+    if (context.current) {
+      const { coneSource, renderWindow } = context.current;
+      coneSource.setResolution(coneResolution);
+      renderWindow.render();
+    }
+  }, [coneResolution]);
+
+  useEffect(() => {
+    if (context.current) {
+      const { actor, renderWindow } = context.current;
+      actor.getProperty().setRepresentation(representation);
+      renderWindow.render();
+    }
+  }, [representation]);
+
+  return (
+    <div>
+      <div ref={vtkContainerRef} />
+    </div>
+  );
+
+}
 
   function ModelViewer() {
 
@@ -27,11 +109,8 @@ import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
     // ----------------------------------------------------------------------------
     // Standard rendering code setup
     // ----------------------------------------------------------------------------
- 
-    //container: { justifyContent: 'center', alignItems: 'center', position:'relative'}
-
+  
     //First, Initialize Renderer
-    //const container = document.querySelector('#mainViewer');
 
     useEffect(() => {
     const container = document.createElement('div');
@@ -123,17 +202,46 @@ import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
     };
   }, []); 
 
+  const [isVTKVisible, showVTK] = useState(false);
+  const toggleShowVisible = () => {
+    showVTK(!isVTKVisible);
+  };
     
     return (
       <div>
         <h1>Model Viewer</h1>
         <p>This is the Model Viewer.</p>
+        
+        <div style={{ zIndex: 99 }}>
+        <button onClick={toggleShowVisible}>Toggle show</button>{" "}
       </div>
+      <div> {isVTKVisible ? <VTK /> : <div />} </div>
+      </div>
+
+      
       
     );
     
   }
-
+/*     /*
+        <Box sx={{ minWidth: 120 }}>
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Clothing Type</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={clothingType}
+            onChange={handleChange}
+          >
+            <MenuItem value={"shirt"}>Shirt</MenuItem>
+            <MenuItem value={"dress_shirt"}>Dress Shirt</MenuItem>
+            <MenuItem value={"pants"}>Pants</MenuItem>
+          </Select>
+        </FormControl>
+        </Box>
+        */
 
 //<div id="mainViewer" class="ui-widget-content" float= "right" width= "800px" max-height= "10%" background-color= "#000" boarder = "none" margin= "0 5px"> </div>
 export default ModelViewer;
+
+
