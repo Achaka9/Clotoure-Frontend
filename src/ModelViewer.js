@@ -17,6 +17,7 @@ import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
 import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
 import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
 import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
+import vtkOBJReader from '@kitware/vtk.js/IO/Misc/OBJReader';
 //import {ResizeSensor}     from 'css-element-queries'
 
 //Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
@@ -53,12 +54,17 @@ import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
     // ----------------------------------------------------------------------------
     // Example code
     // ----------------------------------------------------------------------------
+    const reader = new FileReader();
+    const objReader = vtkOBJReader.newInstance();
+    objReader.parseAsText(reader.result)
 
     const actor = vtkActor.newInstance();
     renderer.addActor(actor);
 
     const mapper = vtkMapper.newInstance();
     actor.setMapper(mapper);
+    
+    const source = objreader.getOutputData();
 
     const sphereSource = vtkSphereSource.newInstance();
     sphereSource.setThetaResolution(64);
@@ -101,7 +107,10 @@ import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
     })();
 
     tcoordFilter.setInputConnection(sphereSource.getOutputPort());
+
     mapper.setInputConnection(tcoordFilter.getOutputPort());
+
+    
 
     const gridSource = vtkImageGridSource.newInstance();
     gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
