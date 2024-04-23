@@ -94,17 +94,20 @@ function CameraComponent() {
 
   const handleConfirm = (type) => {
     const imageSrc = type === "front" ? capturedFront : capturedBack;
-    const blobFile = base64toImage(imageSrc);
-    const file = new File([blobFile], `${type}_${clothingType}.png`);
+    //const blobFile = base64toImage(imageSrc);
+    //const file = new File([blobFile], `${type}_${clothingType}.png`);
     if (type === "front") {
-      setFrontImageFile(file);
+      console.log("front");
+      //setFrontImageFile(file);
       setShowPreviewFront(false);
     } else {
-      setBackImageFile(file);
+      console.log("back");
+      //setBackImageFile(file);
       setShowPreviewBack(false);
     }
     // Check if both images are confirmed
-    if ((type === "front" && backImageFile) || (type === "back" && frontImageFile)) {
+    if (capturedFront && capturedBack) {
+      console.log("Segmenting");
       segment(); // Trigger segmentation after both are confirmed
     }
   };
@@ -174,7 +177,7 @@ function CameraComponent() {
         )}
       </div>
       <Box style={{ alignItems: 'center', justifyContent: 'center' }} sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
-      {capturedFront && 
+      {/*{capturedFront && 
         <img
         src={capturedFront}
         style={{
@@ -195,13 +198,13 @@ function CameraComponent() {
           borderRadius: '10px'
         }}
       />
-      }
+      }*/}
       </Box>
-      <button onClick={captureFront} disabled={isDisabled} style={{ zIndex: 3 }}>Capture Front</button>
+      {/*<button onClick={captureFront} disabled={isDisabled} style={{ zIndex: 3 }}>Capture Front</button>
       <button onClick={captureBack} disabled={isDis} style={{ zIndex: 3 }}>Capture Back</button>
       <button onClick={segment} disabled={loading} style={{ zIndex: 3 }}>
         {loading ? 'Loading...' : 'Segment'}
-      </button>
+      </button>*/}
       <button onClick={capture} style={{ marginTop: 20 }}>
         Capture Photo
       </button>
