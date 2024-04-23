@@ -116,7 +116,9 @@ function ModelViewer() {
 
 
   map_to_model.setInputConnection(objReader.getOutputPort());
-  mapper.setInputConnection(tcoordFilter.getOutputPort());
+  // mapper.setInputConnection(map_to_model.getOutputPort());
+  const source = objReader.getOutputData();
+  mapper.setInputData(source)
 
   const gridSource = vtkImageGridSource.newInstance();
   gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
