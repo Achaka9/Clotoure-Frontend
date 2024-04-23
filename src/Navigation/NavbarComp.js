@@ -47,7 +47,7 @@ function NavbarComp() {
                 <Route exact path="/" element={<HomePage />} />
                 <Route exact path="/camera" element={<CameraPage />} />
                 <Route exact path="/tutorial" element={<UserTutorialPage />} />
-                <Route exact path="/modeliewer" element={<ModelViewer />} />
+                <Route exact path="/modelviewer" element={<ModelViewer />} />
             </Routes>
         </div>
         </Router>
