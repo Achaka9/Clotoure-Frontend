@@ -33,7 +33,7 @@ function VTK() {
   useEffect(() => {
     if (!context.current) {
        const container = document.createElement('div');
-      container.id = 'mainViewer';
+      container.id = 'subViewer';
       document.body.appendChild(container);
     const genericRenderWindow = vtkGenericRenderWindow.newInstance({
         rootContainer: vtkContainerRef.current,
