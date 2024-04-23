@@ -2,13 +2,22 @@ import React from 'react';
 import photoUploadPageImage from './photoUploadPageImage'; //Import image for the photo upload
 import shirtImage from './shirt.jpg'; //Import image for the shirt
 import pantsImage from '/.pants.jpg'; //Import image for the pants
-import frontImagephoto from './front_photo.jpg'; //Import image for the front photo 
-import backImagephoto from './back_photo.jpg'; //Import image for the back photo 
-import segmentImage from './segment.jpg'; //Import image for the segment step
+import frontPhotoImage from './front_photo.jpg'; //Import image for the front photo 
+import backPhotoImage from './back_photo.jpg'; //Import image for the back photo 
+import SegmentImage from './segment.jpg'; //Import image for the segment step
 
 function UserTutorialPage() {
+
+  //centering the text and images on the user tutorial page
+  const centeredStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+  };
+
   return (
-    <div>
+    <div style={centeredStyle}>
       <h1>User Tutorial Page</h1>
       <p>This page contains the user Tutorial page</p>
 
