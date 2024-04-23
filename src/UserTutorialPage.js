@@ -1,16 +1,17 @@
-import React from 'react';
+
+import React from 'react'; /*
 import shirtImage from './shirt.jpg'; //Import image for the shirt
 import pantsImage from '/.pants.jpg'; //Import image for the pants
 import frontImagephoto from './front_photo.jpg'; //Import image for the front photo 
 import backImagephoto from './back_photo.jpg'; //Import image for the back photo 
 import segmentImage from './segment.jpg'; //Import image for the segment step
-
+*/
 function UserTutorialPage() {
   return (
     <div>
       <h1>User Tutorial Page</h1>
       <p>This page contains the user Tutorial page</p>
-
+      /*
       {/*Step 1: Go to the Photo Upload Page*/}
       <div>
         <h2>Step 1: Go to the photo upload page</h2>

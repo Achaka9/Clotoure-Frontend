@@ -1,36 +1,22 @@
-import React from 'react';
-
-// START EXAMPLE CODE
 import '@kitware/vtk.js/favicon';
 
 // Load the rendering pieces we want to use (for both WebGL and WebGPU)
 import '@kitware/vtk.js/Rendering/Profiles/Geometry';
 
-import vtkFullScreenRenderWindow from '@kitware/vtk.js/Rendering/Misc/FullScreenRenderWindow';
-import GenericRenderWindow from '@kitware/vtk.js/Rendering/Misc/GenericRenderWindow';
 import { strFromU8, unzipSync } from 'fflate';
 
 import macro from '@kitware/vtk.js/macros';
 
 import HttpDataAccessHelper from '@kitware/vtk.js/IO/Core/DataAccessHelper/HttpDataAccessHelper';
 import vtkFullScreenRenderWindow from '@kitware/vtk.js/Rendering/Misc/FullScreenRenderWindow';
+import vtkGenericRenderWindow from '@kitware/vtk.js/Rendering/Misc/GenericRenderWindow';
+
 import vtkURLExtract from '@kitware/vtk.js/Common/Core/URLExtract';
 import { fromArrayBuffer } from '@kitware/vtk.js/Common/Core/Base64';
 
 import vtkOBJReader from '@kitware/vtk.js/IO/Misc/OBJReader';
 import vtkMTLReader from '@kitware/vtk.js/IO/Misc/MTLReader';
 import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
-import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
-import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
-import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
-
-//Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
-
-function ModelViewer() {
-  
-// ----------------------------------------------------------------------------
-// Standard rendering code setup
-// ----------------------------------------------------------------------------
 import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
 
 // Force DataAccessHelper to have access to various data source
@@ -65,106 +51,18 @@ function emptyContainer(container) {
   }
 }
 
-function unpack(zipContent) { // NOT USING ZIP FILES
-  if (zipContent instanceof Blob) {
-    return zipContent.arrayBuffer().then((ab) => new Uint8Array(ab));
-  }
-  if (zipContent instanceof ArrayBuffer) {
-    return Promise.resolve(new Uint8Array(zipContent));
-  }
-  return Promise.reject(new Error('invalid zip content'));
-}
-
-function loadZipContent(zipContent, renderWindow, renderer) { // NOT USING ZIP FILES
-  const fileContents = { obj: {}, mtl: {}, img: {} };
-  unpack(zipContent).then((zipArrayBuffer) => {
-    const decompressedFiles = unzipSync(new Uint8Array(zipArrayBuffer));
-
-    function done() {
-      // Attach images to MTLs
-      const promises = [];
-      Object.keys(fileContents.mtl).forEach((mtlFilePath) => {
-        const mtlReader = fileContents.mtl[mtlFilePath];
-        const basePath = mtlFilePath
-          .split('/')
-          .filter((v, i, a) => i < a.length - 1)
-          .join('/');
-        mtlReader.listImages().forEach((relPath) => {
-          const key = basePath.length ? `${basePath}/${relPath}` : relPath;
-          const imgSRC = fileContents.img[key];
-          if (imgSRC) {
-            promises.push(mtlReader.setImageSrc(relPath, imgSRC));
-            console.log('register promise');
-          }
-        });
-      });
-
-      Promise.all(promises).then(() => {
-        console.log('load obj...');
-        // Create pipeline from obj
-        Object.keys(fileContents.obj).forEach((objFilePath) => {
-          const mtlFilePath = objFilePath.replace(/\.obj$/, '.mtl');
-          const objReader = fileContents.obj[objFilePath];
-          const mtlReader = fileContents.mtl[mtlFilePath];
-
-          const size = objReader.getNumberOfOutputPorts();
-          for (let i = 0; i < size; i++) {
-            const source = objReader.getOutputData(i);
-            const mapper = vtkMapper.newInstance();
-            const actor = vtkActor.newInstance();
-            const name = source.get('name').name;
-
-            actor.setMapper(mapper);
-            mapper.setInputData(source);
-            renderer.addActor(actor);
-
-            if (mtlReader && name) {
-              mtlReader.applyMaterialToActor(name, actor);
-            }
-          }
-        });
-        renderer.resetCamera();
-        renderWindow.render();
-      });
-    }
-
-    Object.entries(decompressedFiles).forEach(([relativePath, fileData]) => {
-      if (relativePath.match(/\.obj$/i)) {
-        const txt = strFromU8(fileData);
-        const reader = vtkOBJReader.newInstance({ splitMode: 'usemtl' });
-        reader.parseAsText(txt);
-        fileContents.obj[relativePath] = reader;
-      }
-      if (relativePath.match(/\.mtl$/i)) {
-        const txt = strFromU8(fileData);
-        const reader = vtkMTLReader.newInstance({
-          interpolateTextures: !userParams.noInterpolation,
-        });
-        reader.parseAsText(txt);
-        fileContents.mtl[relativePath] = reader;
-      }
-      if (relativePath.match(/\.jpg$/i) || relativePath.match(/\.png$/i)) {
-        const txt = fromArrayBuffer(fileData);
-        const ext = relativePath.slice(-3).toLowerCase();
-        fileContents.img[relativePath] = `data:image/${ext};base64,${txt}`;
-      }
-    });
-
-    done();
-  });
-}
-
-export function load(container, options) { //CREATE RENDER WINDOW
+function load(container, options) { //CREATE RENDER WINDOW
   autoInit = false;
   emptyContainer(container);
-
-  const fullScreenRenderer = vtkFullScreenRenderWindow.newInstance({
+    
+  const genericRenderer = vtkFullScreenRenderWindow.newInstance({
     background: [1, 0, 0],
     rootContainer: container,
     containerStyle: { height: '50%', width: '50%',  position: 'relative',},
   });
-  const renderer = fullScreenRenderer.getRenderer();
-  const renderWindow = fullScreenRenderer.getRenderWindow();
+  const renderer = genericRenderer.getRenderer();
+  const renderWindow = genericRenderer.getRenderWindow();
+
 
   if (options.file) {
     if (options.ext === 'obj') {
@@ -214,8 +112,14 @@ export function load(container, options) { //CREATE RENDER WINDOW
     });
   }
 }
+/*
+function loadOBJ(container) {
+  const objFile = 
 
-export function initLocalFileLoader(container) { //SEARCH FOR LOCAL
+}
+*/
+
+function initLocalFileLoader(container) { //SEARCH FOR LOCAL
   const exampleContainer = document.querySelector('.content');
   const rootBody = document.querySelector('body');
   const myContainer = container || exampleContainer || rootBody;
@@ -244,26 +148,6 @@ export function initLocalFileLoader(container) { //SEARCH FOR LOCAL
       const ext = files[0].name.split('.').slice(-1)[0];
       load(myContainer, { file: files[0], ext });
     }
-  };
-})();
-
-tcoordFilter.setInputConnection(sphereSource.getOutputPort());
-mapper.setInputConnection(tcoordFilter.getOutputPort());
-
-const gridSource = vtkImageGridSource.newInstance();
-gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
-gridSource.setGridSpacing(16, 16, 0);
-gridSource.setGridOrigin(8, 8, 0);
-
-const texture = vtkTexture.newInstance();
-texture.setInterpolate(true);
-texture.setInputConnection(gridSource.getOutputPort());
-actor.addTexture(texture);
-
-// Re-render
-renderer.resetCamera();
-renderWindow.render();
-// END EXAMPMLE CODE
   }
 
   fileInput.addEventListener('change', handleFile);
@@ -288,27 +172,8 @@ if (userParams.url || userParams.fileURL) {
 setTimeout(() => {
   if (autoInit) {
     // load(myContainer, { file: files[0], ext }); FIX THIS TO INIT WITH OBJ MODEL ALREADY LOADED
-
     initLocalFileLoader();
   }
 }, 100);
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-
-export function ModelViewer() { //OPTIONS
-  return (
-    <div>
-      <h1>ModelViewer</h1>
-      <p>Welcome to the model viewer. Choose one of the options:</p>
-      <ul>
-        <li><Link to="/HomePage">Go to HomePage</Link></li>
-        <li><Link to="/tutorial">View Tutorial</Link></li>
-      </ul>
-    </div>
-  );
-}
-
-
-
-export default ModelViewer;
+export default load;
