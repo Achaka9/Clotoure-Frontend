@@ -89,8 +89,8 @@ const mapper1 = vtkMapper.newInstance();
 // Set Mappers to actors
 // set textures to actors
 
-mapper1.setInputConnection(map_to_model.getOutputPort());
-mapper.setInputConnection(map_to_model1.getOutputPort());
+mapper1.setInputConnection(map_to_model1.getOutputPort());
+mapper.setInputConnection(map_to_model.getOutputPort());
 
 actor.setMapper(mapper);
 actor.getProperty().setTexture(texture);
