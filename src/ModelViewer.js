@@ -3,8 +3,6 @@ import '@kitware/vtk.js/favicon';
 // Load the rendering pieces we want to use (for both WebGL and WebGPU)
 import '@kitware/vtk.js/Rendering/Profiles/Geometry';
 
-import { strFromU8, unzipSync } from 'fflate';
-
 import macro from '@kitware/vtk.js/macros';
 
 import HttpDataAccessHelper from '@kitware/vtk.js/IO/Core/DataAccessHelper/HttpDataAccessHelper';
@@ -20,6 +18,7 @@ import vtkMapper from '@kitware/vtk.js/Rendering/Core/Mapper';
 import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
 import vtkHttpDataSetReader from '@kitware/vtk.js/IO/Core/HttpDataSetReader';
 import vtkTextureMapToPlane from '@kitware/vtk.js/Filters/Texture/TextureMapToPlane';
+import vtkTextureMapToSphere from '@kitware/vtk.js/Filters/Texture/TextureMapToSphere';
 
 // Force DataAccessHelper to have access to various data source
 import '@kitware/vtk.js/IO/Core/DataAccessHelper/HtmlDataAccessHelper';
@@ -72,7 +71,7 @@ function load(container, options) { //CREATE RENDER WINDOW
       reader.onload = function onLoad(e) {
         const objReader = vtkOBJReader.newInstance();
         const imageReader = vtkHttpDataSetReader.newInstance();
-        const url = './images/upload-image-image.jpg';
+        const imageURL = './assets/panda.jpg';
         imageReader.setUrl(url);
         objReader.parseAsText(reader.result);
         const nbOutputs = objReader.getNumberOfOutputPorts();
@@ -80,7 +79,7 @@ function load(container, options) { //CREATE RENDER WINDOW
           const source = objReader.getOutputData(idx);
           const mapper = vtkMapper.newInstance();
           const actor = vtkActor.newInstance();
-          const map_to_model = vtkTextureMapToPlane().newInstance();
+          const map_to_model = vtkTextureMapToPlane.newInstance();
           map_to_model.setInputConnection(objReader.getOutputPort());
           actor.setMapper(mapper);
           mapper.setInputData(source);
