@@ -5,9 +5,11 @@ import CameraComponent from './CameraComponent';
 
 function CameraPage() {
   return (
-    <div class="center">
-      <ImageButton/>
+    <div style={{ alignItems: 'center', justifyContent: 'center' }}>
+      
       <CameraComponent/>
+      <br></br>
+      <ImageButton/>
     </div>
   );
 }

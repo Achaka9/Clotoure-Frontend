@@ -25,15 +25,10 @@ function CameraComponent() {
   const [isDisabled, setIsDisabled] = useState(true);
   const [isDis, setIsDis] = useState(true);
   
-  const [frontImageFile, setFrontImageFile] = useState(null);
-  const [frontFileName, setFrontFileName] = useState('');
-  const [backImageFile, setBackImageFile] = useState(null);
-  const [backFileName, setBackFileName] = useState('');
 
   const [capturedFront, setCapturedFront] = useState(null);
   const [capturedBack, setCapturedBack] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
-  const [fileName, setFileName] = useState('');
+
   const [loading, setLoading] = useState(false);
 
   /* Process
@@ -61,25 +56,26 @@ function CameraComponent() {
     return 1;
   });
 
-  const capture = useCallback(() => {
+  const captureFront = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
-    let blobFile = base64toImage(imageSrc);
-    if (!backImageFile){  
-      setCapturedFront(imageSrc);
-      let name = "front_" + clothingType + ".png";
-      let file = new File([blobFile], name);
-      setFrontImageFile(file);
-      setFrontFileName(name);
-      setIsDisabled(true);
-      setIsDis(false);
-    } else if(frontImageFile){
-      setCapturedBack(imageSrc);
-      let name = "back_" + clothingType + ".png";
-      let file = new File([blobFile], name);
-      setBackImageFile(file);
-      setBackFileName(name);
-    }
+
+    console.log("Front Image taken");
+    setCapturedFront(imageSrc);
+      
+    setIsDisabled(true);
+    setIsDis(false);
+
   }, [webcamRef]);
+
+  const captureBack = useCallback(() => {
+    const imageSrc = webcamRef.current.getScreenshot();
+
+    console.log("Back Image Taken");
+    setCapturedBack(imageSrc);
+    setIsDis(true);
+
+  }, [webcamRef]);
+
 
   const base64toImage = (image) => {
     const byteString = atob(image.split(',')[1]);
@@ -88,16 +84,24 @@ function CameraComponent() {
     for (let i = 0; i < byteString.length; i++) {
       ia[i] = byteString.charCodeAt(i);
     }
-    return new Blob([ab], { type: 'image/jpeg' });
+    return new Blob([ab], { type: 'image/png' });
   };
 
   const segment = () => {
     setLoading(true);
     const formData = new FormData();
-    var frnt = frontImageFile;
-    var bck = backImageFile;
-    formData.append('front', frnt, frontFileName);
-    formData.append('back', bck, backFileName);
+    let frontBlob = base64toImage(capturedFront);
+    let  ffname = "front_" + clothingType + ".png";
+    const front = new File([frontBlob], ffname);
+
+    let backBlob = base64toImage(capturedBack);
+    let  bfname = "back_" + clothingType + ".png";
+    const back = new File([backBlob], bfname);
+
+    //var frnt = frontImageFile;
+    //var bck = backImageFile;
+    formData.append('front', front, ffname);
+    formData.append('back', back, bfname);
     var data = JSON.stringify({"clothing_name": "Mexico_Shirt"})
     formData.append('data', data)
         
@@ -176,6 +180,7 @@ function CameraComponent() {
             }}
         />}
       </div>
+      <Box style={{ alignItems: 'center', justifyContent: 'center' }} sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
       {capturedFront && 
         <img
         src={capturedFront}
@@ -183,8 +188,7 @@ function CameraComponent() {
           width: '300px',
           height: 'auto',
           border: '2px solid #ccc',
-          borderRadius: '10px',
-          margin: '0 auto'
+          borderRadius: '10px'
         }}
       />
       }
@@ -195,12 +199,13 @@ function CameraComponent() {
           width: '300px',
           height: 'auto',
           border: '2px solid #ccc',
-          borderRadius: '10px',
-          margin: '0 auto'
+          borderRadius: '10px'
         }}
       />
       }
-      <button onClick={capture} style={{ zIndex: 3 }}>Capture Photo</button>
+      </Box>
+      <button onClick={captureFront} disabled={isDisabled} style={{ zIndex: 3 }}>Capture Front</button>
+      <button onClick={captureBack} disabled={isDis} style={{ zIndex: 3 }}>Capture Back</button>
       <button onClick={segment} disabled={loading} style={{ zIndex: 3 }}>
         {loading ? 'Loading...' : 'Segment'}
       </button>
