@@ -18,12 +18,15 @@ import vtkPolyData from '@kitware/vtk.js/Common/DataModel/PolyData';
 import vtkSphereSource from '@kitware/vtk.js/Filters/Sources/SphereSource';
 import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
 import vtkOBJReader from '@kitware/vtk.js/IO/Misc/OBJReader';
+import vtkTextureMapToPlane from '@kitware/vtk.js/Filters/Texture/TextureMapToPlane';
+import vtkHttpDataSetReader from '@kitware/vtk.js/IO/Core/HttpDataSetReader';
+
 //import {ResizeSensor}     from 'css-element-queries'
 
 //Need: vtkrenderingOpenGL2, vtkNamedColors, vtkTextureMapToPlane, vtkJPEGReader, vtkOBJReader, vtkCameraOrientationWidget, vtkAxesActor(axes), vtkPolyDataMapper, vtkRenderWindow, vtkRenderWindowInteractor, vtkRenderer, vtkTexture, vtkProperty
 
   function ModelViewer() {
-
+  
   
     // ----------------------------------------------------------------------------
     // Standard rendering code setup
@@ -54,17 +57,33 @@ import vtkOBJReader from '@kitware/vtk.js/IO/Misc/OBJReader';
     // ----------------------------------------------------------------------------
     // Example code
     // ----------------------------------------------------------------------------
-    const reader = new FileReader();
-    const objReader = vtkOBJReader.newInstance();
-    objReader.parseAsText(reader.result)
+      /*
+    const reader = vtkOBJReader.newInstance();
+    // =====================
 
+    reader.setUrl('./OBJFiles/TShirt/splitback.obj')
+  .then(() => {
+    reader.loadData().then(() => {
+      const actor = vtkActor.newInstance();
+      const mapper = vtkMapper.newInstance();
+      mapper.setInputData(reader.getOutputData());
+      actor.setMapper(mapper);
+      renderer.addActor(actor);
+      renderer.resetCamera();
+      renderWindow.render();
+    });
+  })
+  .catch((error) => {
+    console.error('Error loading OBJ file:', error);
+  });
+
+    // =====================
+*/
     const actor = vtkActor.newInstance();
     renderer.addActor(actor);
-
+    
     const mapper = vtkMapper.newInstance();
     actor.setMapper(mapper);
-    
-    const source = objreader.getOutputData();
 
     const sphereSource = vtkSphereSource.newInstance();
     sphereSource.setThetaResolution(64);
@@ -107,10 +126,7 @@ import vtkOBJReader from '@kitware/vtk.js/IO/Misc/OBJReader';
     })();
 
     tcoordFilter.setInputConnection(sphereSource.getOutputPort());
-
     mapper.setInputConnection(tcoordFilter.getOutputPort());
-
-    
 
     const gridSource = vtkImageGridSource.newInstance();
     gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
