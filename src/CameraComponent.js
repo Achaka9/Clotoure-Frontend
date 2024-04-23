@@ -13,6 +13,10 @@ function CameraComponent() {
   const webcamRef = useRef(null);
   const [clothingType, setClothingType] = useState("");
   const [clothingOutline, setClothingOutline] = useState([]);
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [isDis, setIsDis] = useState(true);
+  
+
   const [frontImageFile, setFrontImageFile] = useState(null);
   const [backImageFile, setBackImageFile] = useState(null);
   const [capturedFront, setCapturedFront] = useState(null);
@@ -33,6 +37,15 @@ function CameraComponent() {
     setClothingOutline(clothingTypes[type]);
   };
 
+  const currentOutline = (() => {
+    console.log("Here");
+    if(!capturedFront){
+      console.log(0);
+      return 0;
+    }
+    return 1;
+  });
+
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     if (!capturedFront) {
@@ -47,10 +60,20 @@ function CameraComponent() {
   const segment = () => {
     setLoading(true);
     const formData = new FormData();
-    formData.append('front', frontImageFile);
-    formData.append('back', backImageFile);
-    var data = JSON.stringify({"clothing_name": "Mexico_Shirt"});
-    formData.append('data', data);
+    let frontBlob = base64toImage(capturedFront);
+    let  ffname = "front_" + clothingType + ".png";
+    const front = new File([frontBlob], ffname);
+
+    let backBlob = base64toImage(capturedBack);
+    let  bfname = "back_" + clothingType + ".png";
+    const back = new File([backBlob], bfname);
+
+    //var frnt = frontImageFile;
+    //var bck = backImageFile;
+    formData.append('front', front, ffname);
+    formData.append('back', back, bfname);
+    var data = JSON.stringify({"clothing_name": "Mexico_Shirt"})
+    formData.append('data', data)
         
     const url = "http://localhost:5000/segment";
     
@@ -150,6 +173,35 @@ function CameraComponent() {
           />
         )}
       </div>
+      <Box style={{ alignItems: 'center', justifyContent: 'center' }} sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
+      {capturedFront && 
+        <img
+        src={capturedFront}
+        style={{
+          width: '300px',
+          height: 'auto',
+          border: '2px solid #ccc',
+          borderRadius: '10px'
+        }}
+      />
+      }
+      {capturedBack && 
+        <img
+        src={capturedBack}
+        style={{
+          width: '300px',
+          height: 'auto',
+          border: '2px solid #ccc',
+          borderRadius: '10px'
+        }}
+      />
+      }
+      </Box>
+      <button onClick={captureFront} disabled={isDisabled} style={{ zIndex: 3 }}>Capture Front</button>
+      <button onClick={captureBack} disabled={isDis} style={{ zIndex: 3 }}>Capture Back</button>
+      <button onClick={segment} disabled={loading} style={{ zIndex: 3 }}>
+        {loading ? 'Loading...' : 'Segment'}
+      </button>
       <button onClick={capture} style={{ marginTop: 20 }}>
         Capture Photo
       </button>
