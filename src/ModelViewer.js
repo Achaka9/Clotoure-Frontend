@@ -128,8 +128,6 @@ import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
       <div>
         <h1>Model Viewer</h1>
         <p>This is the Model Viewer.</p>
-        <div id="mainViewer" class="ui-widget-content" float= "right" width= "800px" max-height= "10%" background-color= "#000" boarder = "none" margin= "0 5px">  
-          </div>
       </div>
       
     );
@@ -137,5 +135,5 @@ import vtkTexture from '@kitware/vtk.js/Rendering/Core/Texture';
   }
 
 
-
+//<div id="mainViewer" class="ui-widget-content" float= "right" width= "800px" max-height= "10%" background-color= "#000" boarder = "none" margin= "0 5px"> </div>
 export default ModelViewer;
