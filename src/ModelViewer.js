@@ -36,7 +36,7 @@ import vtkHttpDataSetReader from '@kitware/vtk.js/IO/Core/HttpDataSetReader';
 
     //First, Initialize Renderer
     //const container = document.querySelector('#mainViewer');
-
+    
     useEffect(() => {
     const container = document.createElement('div');
     container.id = 'mainViewer';
@@ -57,16 +57,16 @@ import vtkHttpDataSetReader from '@kitware/vtk.js/IO/Core/HttpDataSetReader';
     // ----------------------------------------------------------------------------
     // Example code
     // ----------------------------------------------------------------------------
-      /*
-    const reader = vtkOBJReader.newInstance();
+      
+    const objReader = vtkOBJReader.newInstance();
     // =====================
 
-    reader.setUrl('./OBJFiles/TShirt/splitback.obj')
+    objReader.setUrl('./OBJFiles/TShirt/splitback.obj')
   .then(() => {
-    reader.loadData().then(() => {
+    objReader.loadData().then(() => {
       const actor = vtkActor.newInstance();
       const mapper = vtkMapper.newInstance();
-      mapper.setInputData(reader.getOutputData());
+      mapper.setInputData(objReader.getOutputData());
       actor.setMapper(mapper);
       renderer.addActor(actor);
       renderer.resetCamera();
@@ -78,16 +78,12 @@ import vtkHttpDataSetReader from '@kitware/vtk.js/IO/Core/HttpDataSetReader';
   });
 
     // =====================
-*/
+
     const actor = vtkActor.newInstance();
     renderer.addActor(actor);
     
     const mapper = vtkMapper.newInstance();
     actor.setMapper(mapper);
-
-    const sphereSource = vtkSphereSource.newInstance();
-    sphereSource.setThetaResolution(64);
-    sphereSource.setPhiResolution(32);
 
     // create a filter on the fly to generate tcoords from normals
     const tcoordFilter = macro.newInstance((publicAPI, model) => {
@@ -125,8 +121,9 @@ import vtkHttpDataSetReader from '@kitware/vtk.js/IO/Core/HttpDataSetReader';
       };
     })();
 
-    tcoordFilter.setInputConnection(sphereSource.getOutputPort());
-    mapper.setInputConnection(tcoordFilter.getOutputPort());
+
+    map_to_model.setInputConnection(objReader.getOutputPort());
+    mapper.setInputConnection(map_to_model.getOutputPort());
 
     const gridSource = vtkImageGridSource.newInstance();
     gridSource.setDataExtent(0, 511, 0, 511, 0, 0);

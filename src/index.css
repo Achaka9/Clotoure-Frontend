@@ -26,7 +26,7 @@ code {
 
 #mainViewer {
   position: absolute;
-  top: 60%;  /* 50% from the top */
+  top: 80%;  /* 50% from the top */
   left: 50%; /* 50% from the left */
   transform: translate(-50%, -50%);  /* Center it by moving half its size up and left */
   background-color: #000;
