@@ -12,6 +12,19 @@ code {
     monospace;
 }
 
+
+/*
+#mainViewer{
+  float: right;
+  width: 800px;
+  max-height: 10%;
+  background-color: #000;
+  border: 10px solid #603d38;
+  margin: 0 5px;
+}
+
+*/
+
 #mainViewer {
   position: absolute;
   top: 60%;  /* 50% from the top */
@@ -30,3 +43,4 @@ code {
   background-color: #000;
   border: none;
 }
+
