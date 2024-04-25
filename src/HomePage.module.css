@@ -1,0 +1,149 @@
+/* HomePage.module.css */
+
+/* General Reset */
+html, body, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Prevent scrollbars on the html/body */
+  }
+  
+/* Container for the full page */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+  }
+
+  /* Main Content */
+.main {
+    flex: 1; /* Takes up the remaining space, accounting for the navigation bar */
+    overflow-y: auto; /* Allows scrolling within the main content area if necessary */
+  }
+  
+  .header {
+    width: 100%;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    background: transparent; /* No color, ensuring there's no white bar */
+    z-index: 1000; /* Make sure it's above other content */
+  }
+  
+  .logo {
+    max-width: 150px;
+  }
+  
+  .navigation {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .navLink {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+  
+  .navLink:hover,
+  .navLink:focus {
+    color: #007bff;
+  }
+  
+  /* Full-page Sections */
+  .fullHeight {
+    scroll-snap-align: start;
+    min-height: 100vh; /* Each section will take at least the height of the viewport */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  /* First section - Hero */
+  .heroSection {
+    background: url('./HomePageImages/background.gif') no-repeat center center;
+    background-size: cover;
+    color: #fff;
+    position: relative;
+  }
+
+  .heroSection::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5); /* Adjust the alpha for more or less transparency */
+    z-index: 1; /* Ensure it's below the text */
+  }
+
+  .heroText {
+    position: relative;
+    z-index: 2; /* Higher than the overlay */
+    color: white; /* Or any color that makes the text stand out */
+    /* ... any other styling you need for the text ... */
+  }
+  
+  /* Subsequent sections */
+/* Content Section Style */
+
+.contentSection {
+  display: flex;
+  align-items: center; /* Align vertically */
+  justify-content: center; /* Center the content horizontally */
+  gap: 2rem; /* Adjust the gap between the text and the image */
+  padding: 4rem; /* Add padding as needed */
+  flex-wrap: nowrap; /* Prevent wrapping of items */
+}
+
+.textArea {
+  flex: 1;
+  max-width: 600px; /* Set a max-width for the text area */
+}
+
+.textBlock {
+  margin-bottom: 1rem; /* Add some margin between text blocks */
+  /* Keep your text block styling here */
+}
+
+.imageArea {
+  flex: 1; /* Give image area flex of 1 to take up the remaining space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+imageArea {
+  flex: 1; /* Give image area flex of 1 to take up the remaining space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Add a media query for large screens if needed, to constrain the image area size */
+@media (max-width: 768px) {
+  .contentSection {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .textArea {
+    order: 2; /* Text comes after the image on small screens */
+  }
+
+  .imageArea {
+    order: 1; /* Image comes before the text on small screens */
+    width: 100%; /* Image takes full width on small screens */
+  }
+
+  .imageArea img {
+    max-width: 60%; /* Image takes 60% of the width on small screens */
+  }
+}
