@@ -6,19 +6,18 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import shirtOutline from './cameraOutlines/shirt_front_Outline.png';
-import backShirtOutline from './cameraOutlines/Shirt_back_Outline.png';
+import shirtOutline from './cameraOutlines/tshirts/shirt_front_Outline.png';
+import backShirtOutline from './cameraOutlines/tshirts/Shirt_back_Outline.png';
+import dressShirtFront from './cameraOutlines/longSleeveShirts/longSleeveFront-removebg-preview.png';
+import dressShirtBack from './cameraOutlines/longSleeveShirts/longSleeveBack-removebg-preview.png';
+import pantsFront from './cameraOutlines/pants/PantsOutlineFront-removebg-preview.png';
+import pantsBack from './cameraOutlines/pants/PantsOutlineBack-removebg-preview.png';
 
 function CameraComponent() {
   const webcamRef = useRef(null);
   const [clothingType, setClothingType] = useState("");
   const [clothingOutline, setClothingOutline] = useState([]);
-  const [isDisabled, setIsDisabled] = useState(true);
-  const [isDis, setIsDis] = useState(true);
-  
 
-  const [frontImageFile, setFrontImageFile] = useState(null);
-  const [backImageFile, setBackImageFile] = useState(null);
   const [capturedFront, setCapturedFront] = useState(null);
   const [capturedBack, setCapturedBack] = useState(null);
   const [showPreviewFront, setShowPreviewFront] = useState(false);
@@ -27,8 +26,8 @@ function CameraComponent() {
 
   const clothingTypes = {
     "shirt": [shirtOutline, backShirtOutline],
-    "dress_shirt": [],
-    "pants": []
+    "dress_shirt": [dressShirtFront, dressShirtBack],
+    "pants": [pantsFront, pantsBack]
   };
 
   const handleChange = (event) => {
@@ -37,14 +36,9 @@ function CameraComponent() {
     setClothingOutline(clothingTypes[type]);
   };
 
-  const currentOutline = (() => {
-    console.log("Here");
-    if(!capturedFront){
-      console.log(0);
-      return 0;
-    }
-    return 1;
-  });
+  const currentOutline = () => {
+    return capturedFront ? 1 : 0; // 0 for front, 1 for back
+  };
 
   const capture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -61,20 +55,18 @@ function CameraComponent() {
     setLoading(true);
     const formData = new FormData();
     let frontBlob = base64toImage(capturedFront);
-    let  ffname = "front_" + clothingType + ".png";
+    let ffname = "front_" + clothingType + ".png";
     const front = new File([frontBlob], ffname);
 
     let backBlob = base64toImage(capturedBack);
-    let  bfname = "back_" + clothingType + ".png";
+    let bfname = "back_" + clothingType + ".png";
     const back = new File([backBlob], bfname);
 
-    //var frnt = frontImageFile;
-    //var bck = backImageFile;
     formData.append('front', front, ffname);
     formData.append('back', back, bfname);
     var data = JSON.stringify({"clothing_name": "Mexico_Shirt"})
     formData.append('data', data)
-        
+
     const url = "http://localhost:5000/segment";
     
     Axios.post(url, formData, {
@@ -93,21 +85,12 @@ function CameraComponent() {
   };
 
   const handleConfirm = (type) => {
-    const imageSrc = type === "front" ? capturedFront : capturedBack;
-    //const blobFile = base64toImage(imageSrc);
-    //const file = new File([blobFile], `${type}_${clothingType}.png`);
     if (type === "front") {
-      console.log("front");
-      //setFrontImageFile(file);
       setShowPreviewFront(false);
     } else {
-      console.log("back");
-      //setBackImageFile(file);
       setShowPreviewBack(false);
     }
-    // Check if both images are confirmed
     if (capturedFront && capturedBack) {
-      console.log("Segmenting");
       segment(); // Trigger segmentation after both are confirmed
     }
   };
@@ -116,11 +99,9 @@ function CameraComponent() {
     if (type === "front") {
       setCapturedFront(null);
       setShowPreviewFront(false);
-      setFrontImageFile(null);
     } else {
       setCapturedBack(null);
       setShowPreviewBack(false);
-      setBackImageFile(null);
     }
   };
 
@@ -162,7 +143,7 @@ function CameraComponent() {
         />
         {clothingOutline.length > 0 && !showPreviewFront && !showPreviewBack && (
           <img
-            src={clothingType === "shirt" ? clothingOutline[0] : ""}
+            src={clothingOutline[currentOutline()]}
             style={{
               position: 'absolute',
               top: '50%',
@@ -176,35 +157,6 @@ function CameraComponent() {
           />
         )}
       </div>
-      <Box style={{ alignItems: 'center', justifyContent: 'center' }} sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
-      {/*{capturedFront && 
-        <img
-        src={capturedFront}
-        style={{
-          width: '300px',
-          height: 'auto',
-          border: '2px solid #ccc',
-          borderRadius: '10px'
-        }}
-      />
-      }
-      {capturedBack && 
-        <img
-        src={capturedBack}
-        style={{
-          width: '300px',
-          height: 'auto',
-          border: '2px solid #ccc',
-          borderRadius: '10px'
-        }}
-      />
-      }*/}
-      </Box>
-      {/*<button onClick={captureFront} disabled={isDisabled} style={{ zIndex: 3 }}>Capture Front</button>
-      <button onClick={captureBack} disabled={isDis} style={{ zIndex: 3 }}>Capture Back</button>
-      <button onClick={segment} disabled={loading} style={{ zIndex: 3 }}>
-        {loading ? 'Loading...' : 'Segment'}
-      </button>*/}
       <button onClick={capture} style={{ marginTop: 20 }}>
         Capture Photo
       </button>
