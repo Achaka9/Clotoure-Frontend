@@ -4,9 +4,9 @@ import phoneImage from './HomePageImages/phoneImage.png'; // Make sure the path 
 
 function HomePage() {
   return (
-    <div className={styles.container}>
+    <div className={styles.homeContainer}>
       
-      <main className={styles.main}>
+      <main className={styles.homeMain}>
         {/* Hero section */}
         <section className={`${styles.fullHeight} ${styles.heroSection}`}>
           <div className={styles.heroText}>

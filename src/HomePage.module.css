@@ -2,11 +2,24 @@
 
 /* General Reset */
 html, body, #root {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden; /* Prevent scrollbars on the html/body */
-  }
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: auto; /* Change to 'auto' to allow scrolling */
+}
+
+/* Specific container for the homepage to avoid affecting other pages */
+.homeContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Use min-height instead of height to allow for longer content */
+}
+
+/* Main Content - specific to the homepage */
+.homeMain {
+  flex: 1;
+  overflow-y: auto; /* Ensures content can scroll */
+}
   
 /* Container for the full page */
 .container {
