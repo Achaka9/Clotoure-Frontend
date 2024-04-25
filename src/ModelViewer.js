@@ -242,6 +242,6 @@ function VTK() {
         */
 
 //<div id="mainViewer" class="ui-widget-content" float= "right" width= "800px" max-height= "10%" background-color= "#000" boarder = "none" margin= "0 5px"> </div>
-export default ModelViewer;
 
+export default ModelViewer;
 

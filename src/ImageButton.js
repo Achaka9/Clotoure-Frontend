@@ -188,8 +188,8 @@ function ImageButton() {
       };
 
     return (
-        <div>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
+        <div style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <Box style={{ alignItems: 'center', justifyContent: 'center' }} sx={{ display: 'flex', flexWrap: 'wrap', minWidth: 300, width: '100%' }}>
                 <ImgButton
                 focusRipple
                 key={images[0].title}
