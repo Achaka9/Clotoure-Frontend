@@ -1,10 +1,12 @@
 import React from 'react';
+
 import photoUploadPageImage from './photoUploadPageImage'; //Import image for the photo upload
 import shirtImage from './shirt.jpg'; //Import image for the shirt
 import pantsImage from '/.pants.jpg'; //Import image for the pants
 import frontPhotoImage from './front_photo.jpg'; //Import image for the front photo 
 import backPhotoImage from './back_photo.jpg'; //Import image for the back photo 
 import SegmentImage from './segment.jpg'; //Import image for the segment step
+
 
 function UserTutorialPage() {
 
