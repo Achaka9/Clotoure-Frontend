@@ -1,54 +1,32 @@
-// File: src/ModelViewer.js
-import React, { useEffect, useRef } from 'react';
-import vtkFullScreenRenderWindow from 'vtk.js/Sources/Rendering/Misc/FullScreenRenderWindow';
-import vtkActor from 'vtk.js/Sources/Rendering/Core/Actor';
-import vtkMapper from 'vtk.js/Sources/Rendering/Core/Mapper';
-import vtkSTLReader from 'vtk.js/Sources/IO/Geometry/STLReader';
-import vtkConeSource from 'vtk.js/Sources/Filters/Sources/ConeSource';
+import React, { useState } from 'react';
 
+const ModelViewer = () => {
+  const [output, setOutput] = useState('');
+  const [error, setError] = useState('');
 
-const ModelViewer = ({ url }) => {
-    const vtkContainerRef = useRef(null);
-
-    useEffect(() => {
-      if (!vtkContainerRef.current) {
-          return;
-      }
-  
-      const fullScreenRenderWindow = vtkFullScreenRenderWindow.newInstance({
-          rootContainer: vtkContainerRef.current,
-          containerStyle: {},
+  const runPythonScript = () => {
+    fetch('/api/run-python') // Assuming your server has a /api/run-python route that runs the Python script
+      .then(res => res.json())
+      .then(data => {
+        setOutput(data.output);
+        setError(data.error);
+      })
+      .catch(err => {
+        setError('Error calling the API');
+        console.error(err);
       });
-  
-      const renderer = fullScreenRenderWindow.getRenderer();
-      const renderWindow = fullScreenRenderWindow.getRenderWindow();
-  
-      const coneSource = vtkConeSource.newInstance();
-      const mapper = vtkMapper.newInstance();
-  
-      if (coneSource && mapper) {
-          mapper.setInputConnection(coneSource.getOutputPort());
-      }
-  
-      const actor = vtkActor.newInstance();
-      if (actor && mapper) {
-          actor.setMapper(mapper);
-      }
-  
-      if (renderer && actor) {
-          renderer.addActor(actor);
-          renderer.resetCamera();
-          renderWindow.render();
-      }
-  
-      return () => {
-          if (fullScreenRenderWindow) {
-              fullScreenRenderWindow.delete();
-          }
-      };
-  }, []);
+  };
 
-    return <div ref={vtkContainerRef} style={{ width: '100%', height: '500px' }} />;
+  return (
+    <div>
+      <h1>Model Viewer</h1>
+      <button onClick={runPythonScript}>Run Python Script</button>
+      <p>Output:</p>
+      <pre>{output}</pre>
+      <p>Error:</p>
+      <pre>{error}</pre>
+    </div>
+  );
 };
 
 export default ModelViewer;
