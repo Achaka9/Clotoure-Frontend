@@ -119,15 +119,8 @@ function ModelViewer() {
     document.body.appendChild(container);
     const genericRenderWindow = vtkGenericRenderWindow.newInstance();
 
+    
 
-    // VTK renderWindow/renderer
-    const renderWindow = genericRenderWindow.getRenderWindow();
-    const renderer = genericRenderWindow.getRenderer();
-    renderer.setBackground(0.0, 0.05, 0.0);
-    genericRenderWindow.setContainer(container);
-        //not properly working on microsoft edge,, there is no standard for handling resize event
-       // new ResizeSensor(container, genericRenderWindow.resize);
-    genericRenderWindow.resize();
 
     
     // ----------------------------------------------------------------------------
@@ -135,14 +128,10 @@ function ModelViewer() {
     // ----------------------------------------------------------------------------
       
     const actor = vtkActor.newInstance();
-
-
     const mapper = vtkMapper.newInstance();
-  
-    
-    
+
     const scene = [];
-    /*
+    /* //SPHERE
     const sphereSource = vtkSphereSource.newInstance();
     sphereSource.setThetaResolution(64);
     sphereSource.setPhiResolution(32);
@@ -156,20 +145,15 @@ function ModelViewer() {
     });
     */
 
-    reader.setUrl('../OBJFiles/TShirt/splitfront.obj')
-          const polydata = reader.getOutputData();
-          //const name = polydata.get('name').name;
-          mapper.setInputData(polydata);
-          actor.setMapper(mapper);
+    reader.setUrl('./OBJFiles/TShirt/splitfront.obj')
+    const polydata = reader.getOutputData();
+    //const name = polydata.get('name').name;
+    mapper.setInputConnection(polydata);
+    actor.setMapper(mapper);
 
-          renderer.addActor(actor);
-
-          scene.push({ name, polydata, mapper, actor });
-        renderer.resetCamera();
-        renderWindow.render();
 
     
-    /*
+    /*  //TCOORDFILTER
     // create a filter on the fly to generate tcoords from normals
     const tcoordFilter = macro.newInstance((publicAPI, model) => {
       macro.obj(publicAPI, model); // make it an object
@@ -210,7 +194,7 @@ function ModelViewer() {
     mapper.setInputConnection(tcoordFilter.getOutputPort());
     */
     
-    /*
+    /* //GRID TEXTURE
 
     const gridSource = vtkImageGridSource.newInstance();
     gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
@@ -227,10 +211,26 @@ function ModelViewer() {
     renderWindow.render();
       // END EXAMPMLE CODE
     */
-      
+
+        // VTK renderWindow/renderer
+    const renderer = genericRenderWindow.getRenderer();
+    const renderWindow = genericRenderWindow.getRenderWindow();
+    renderer.setBackground(0.0, 0.05, 0.0);
+    genericRenderWindow.setContainer(container);
+        //not properly working on microsoft edge,, there is no standard for handling resize event
+        // new ResizeSensor(container, genericRenderWindow.resize);
+    genericRenderWindow.resize();
+
+
+    renderer.addActor(actor);
+    renderer.resetCamera();
+    renderWindow.render();
+
     return () => {
       document.body.removeChild(container);
     };
+
+
   }, []); 
 
   const [isVTKVisible, showVTK] = useState(false);
@@ -249,8 +249,6 @@ function ModelViewer() {
       <div> {isVTKVisible ? <VTK /> : <div />} </div>
       </div>
 
-      
-      
     );
     
   }
