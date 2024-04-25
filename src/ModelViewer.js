@@ -157,9 +157,7 @@ function ModelViewer() {
     */
 
     reader.setUrl('../OBJFiles/TShirt/splitfront.obj')
-        const size = reader.getNumberOfOutputPorts();
-        for (let i = 0; i < size; i++) {
-          const polydata = reader.getOutputData(i);
+          const polydata = reader.getOutputData();
           //const name = polydata.get('name').name;
           mapper.setInputData(polydata);
           actor.setMapper(mapper);
@@ -167,10 +165,8 @@ function ModelViewer() {
           renderer.addActor(actor);
 
           scene.push({ name, polydata, mapper, actor });
-        }
         renderer.resetCamera();
         renderWindow.render();
-
 
     
     /*
