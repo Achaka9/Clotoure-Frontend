@@ -122,7 +122,7 @@ function ModelViewer() {
 
     // VTK renderWindow/renderer
     const renderWindow = genericRenderWindow.getRenderWindow();
-    const  renderer = genericRenderWindow.getRenderer();
+    const renderer = genericRenderWindow.getRenderer();
     renderer.setBackground(0.0, 0.05, 0.0);
     genericRenderWindow.setContainer(container);
         //not properly working on microsoft edge,, there is no standard for handling resize event
@@ -133,26 +133,46 @@ function ModelViewer() {
     // ----------------------------------------------------------------------------
     // Example code
     // ----------------------------------------------------------------------------
-
+      
     const actor = vtkActor.newInstance();
-    renderer.addActor(actor);
+
 
     const mapper = vtkMapper.newInstance();
-    actor.setMapper(mapper);
-
+  
+    
+    
+    const scene = [];
     /*
     const sphereSource = vtkSphereSource.newInstance();
     sphereSource.setThetaResolution(64);
     sphereSource.setPhiResolution(32);
-        */
+    */
     const reader = vtkOBJReader.newInstance();
-
+      /*
     reader.setUrl('./OBJFiles/TShirt/splitfront.obj', { binary: true }).then(() => {
       const polydata = reader.getOutputData(0);
       mapper.setInputData(polydata);
       renderWindow.render();
     });
+    */
 
+    reader.setUrl('../OBJFiles/TShirt/splitfront.obj')
+        const size = reader.getNumberOfOutputPorts();
+        for (let i = 0; i < size; i++) {
+          const polydata = reader.getOutputData(i);
+          //const name = polydata.get('name').name;
+          mapper.setInputData(polydata);
+          actor.setMapper(mapper);
+
+          renderer.addActor(actor);
+
+          scene.push({ name, polydata, mapper, actor });
+        }
+        renderer.resetCamera();
+        renderWindow.render();
+
+
+    
     /*
     // create a filter on the fly to generate tcoords from normals
     const tcoordFilter = macro.newInstance((publicAPI, model) => {
@@ -193,6 +213,8 @@ function ModelViewer() {
     tcoordFilter.setInputConnection(sphereSource.getOutputPort());
     mapper.setInputConnection(tcoordFilter.getOutputPort());
     */
+    
+    /*
 
     const gridSource = vtkImageGridSource.newInstance();
     gridSource.setDataExtent(0, 511, 0, 511, 0, 0);
@@ -203,11 +225,12 @@ function ModelViewer() {
     texture.setInterpolate(true);
     texture.setInputConnection(gridSource.getOutputPort());
     actor.addTexture(texture);
-
+    
     // Re-render
     renderer.resetCamera();
     renderWindow.render();
       // END EXAMPMLE CODE
+    */
       
     return () => {
       document.body.removeChild(container);
