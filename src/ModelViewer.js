@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState, useRef, useEffect } from 'react'; 
+import styles from './HomePage.module.css';
 
 import ClothingList from './itemsList';
 
@@ -240,7 +241,7 @@ function VTK() {
       <div>
         
         <h1>Model Viewer</h1>
-        <p>This is the Model Viewer.</p>
+        <p>You can view all clothing models here.</p>
         <br/>
         <br/>
         <br/>
@@ -262,9 +263,15 @@ function VTK() {
         <br/>
         <br/>
         <div><ClothingList items={items}/></div>
-        
-        <div style={{ zIndex: 99 }}>
-        <button onClick={toggleShowVisible}>Toggle show</button>{" "}
+        <div style={{ zIndex: 99 , display: "flex",
+    justifyContent: "center"}}>
+          <button onClick={toggleShowVisible}
+            style={{
+              backgroundColor: "#5b5655",
+              color: "white",
+              fontSize: "16px",
+              padding: "10px 20px",
+    }}>Switch</button>{" "}
       </div>
       <div> {isVTKVisible ? <VTK /> : <div />} </div>
       </div>
@@ -274,25 +281,8 @@ function VTK() {
     );
     
   }
-/*     /*
-        <Box sx={{ minWidth: 120 }}>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Clothing Type</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={clothingType}
-            onChange={handleChange}
-          >
-            <MenuItem value={"shirt"}>Shirt</MenuItem>
-            <MenuItem value={"dress_shirt"}>Dress Shirt</MenuItem>
-            <MenuItem value={"pants"}>Pants</MenuItem>
-          </Select>
-        </FormControl>
-        </Box>
-        */
+
 
 //<div id="mainViewer" class="ui-widget-content" float= "right" width= "800px" max-height= "10%" background-color= "#000" boarder = "none" margin= "0 5px"> </div>
 
 export default ModelViewer;
-
