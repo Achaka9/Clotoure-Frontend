@@ -6,6 +6,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField'
 import shirtOutline from './cameraOutlines/shirt_front_Outline.png';
 import backShirtOutline from './cameraOutlines/Shirt_back_Outline.png';
 
@@ -13,12 +14,9 @@ function CameraComponent() {
   const webcamRef = useRef(null);
   const [clothingType, setClothingType] = useState("");
   const [clothingOutline, setClothingOutline] = useState([]);
-  const [isDisabled, setIsDisabled] = useState(true);
-  const [isDis, setIsDis] = useState(true);
   
+  const [clothingName, setClothingName] = useState("");
 
-  const [frontImageFile, setFrontImageFile] = useState(null);
-  const [backImageFile, setBackImageFile] = useState(null);
   const [capturedFront, setCapturedFront] = useState(null);
   const [capturedBack, setCapturedBack] = useState(null);
   const [showPreviewFront, setShowPreviewFront] = useState(false);
@@ -35,6 +33,10 @@ function CameraComponent() {
     const type = event.target.value;
     setClothingType(type);
     setClothingOutline(clothingTypes[type]);
+  };
+
+  const handleClothingNameChange = (event) => {
+    setClothingName(event.target.value);
   };
 
   const currentOutline = (() => {
@@ -72,7 +74,7 @@ function CameraComponent() {
     //var bck = backImageFile;
     formData.append('front', front, ffname);
     formData.append('back', back, bfname);
-    var data = JSON.stringify({"clothing_name": "Mexico_Shirt"})
+    var data = JSON.stringify({"clothing_name": clothingName})
     formData.append('data', data)
         
     const url = "http://localhost:5000/segment";
@@ -152,6 +154,14 @@ function CameraComponent() {
         </FormControl>
       </Box>
       <br />
+      <TextField
+          required
+          id="clothing_name"
+          label="Required"
+          defaultValue="Clothing Name"
+          onChange={handleClothingNameChange}
+        />
+      <br/>
       <div style={{ position: 'relative', width: '800px', height: '600px' }}>
         <Webcam
           audio={false}

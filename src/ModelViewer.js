@@ -1,6 +1,8 @@
 import React from 'react';
 import { useState, useRef, useEffect } from 'react'; 
 
+import ClothingList from './itemsList';
+
 // START EXAMPLE CODE
 import '@kitware/vtk.js/favicon';
 import Box from '@mui/material/Box';
@@ -9,6 +11,7 @@ import Box from '@mui/material/Box';
 import '@kitware/vtk.js/Rendering/Profiles/Geometry';
 
 import vtkGenericRenderWindow from '@kitware/vtk.js/Rendering/Misc/GenericRenderWindow';
+import Axios from 'axios';
 
 import macro from '@kitware/vtk.js/macros';
 import vtkActor from '@kitware/vtk.js/Rendering/Core/Actor';
@@ -111,6 +114,32 @@ function VTK() {
     // ----------------------------------------------------------------------------
   
     //First, Initialize Renderer
+    
+
+    const[items, setItems] = useState([])
+
+    useEffect(() => {
+      // Define a function to fetch data
+      const fetchData = async () => {
+        try {
+          // Make a GET request to the API endpoint
+          const response = await Axios.get('http://localhost:5000/get_items');
+          // Set the data in state
+          //setData(response.data);
+          // Set loading to false
+          setItems(response.data['items'])
+          
+        } catch (error) {
+          // If an error occurs, set the error in state
+          console.log(error);
+          
+        }
+      };
+  
+      // Call the fetch function
+      fetchData();
+    }, []);
+
 
     useEffect(() => {
     const container = document.createElement('div');
@@ -209,8 +238,30 @@ function VTK() {
     
     return (
       <div>
+        
         <h1>Model Viewer</h1>
         <p>This is the Model Viewer.</p>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <div><ClothingList items={items}/></div>
         
         <div style={{ zIndex: 99 }}>
         <button onClick={toggleShowVisible}>Toggle show</button>{" "}
