@@ -15,6 +15,7 @@ import ModelViewer from "../ModelViewer";
 import UserTutorialPage from "../UserTutorialPage";
 import logo from "../images/clotoure_logo.png";
 import QRCode from "../QRCode";
+import DemoVideo from "../demoVideo";
 
 function NavbarComp() {
     return (
@@ -39,6 +40,7 @@ function NavbarComp() {
                         <Nav.Link as={Link} to={"/tutorial"}>Tutorial</Nav.Link>
                         <Nav.Link as={Link} to={"/modelviewer"}>Model Viewer</Nav.Link>
                         <Nav.Link as={Link} to={"/QRCode"}>QR Code</Nav.Link>
+                        <Nav.Link as={Link} to={"/demoVideo"}>Demo Video</Nav.Link>
                     </Nav>
                     </Navbar.Collapse>
             </Container>
@@ -51,6 +53,7 @@ function NavbarComp() {
                 <Route exact path="/tutorial" element={<UserTutorialPage />} />
                 <Route exact path="/modelviewer" element={<ModelViewer />} />
                 <Route exact path="/QRCode" element={<QRCode />} />
+                <Route exact path="/demoVideo" element={<DemoVideo />} />
             </Routes>
         </div>
         </Router>
